@@ -84,7 +84,8 @@ def ranked_drivers(vertical: str = "All") -> list[dict]:
             if d["vertical_label"] == vertical:
                 key = d["vertical"]
                 break
-        drivers = [d for d in drivers if d["vertical"] == key]
+        # include this vertical's drivers plus the shared 'all' vertical ones
+        drivers = [d for d in drivers if d["vertical"] in (key, "all")]
     return sorted(drivers, key=friction_score, reverse=True)
 
 

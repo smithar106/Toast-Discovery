@@ -114,11 +114,18 @@ def test_control_center():
 
 
 def test_revenue_optimization_flow():
-    from services.optimization import ranked_drivers, friction_score, annual_opportunity
+    from services.optimization import ranked_drivers, friction_score, annual_opportunity, load_drivers
 
     drivers = ranked_drivers("All")
     assert drivers[0]["id"] == "age_verification", "age verification should rank first"
     assert annual_opportunity(drivers[0]) > 0
+
+    # every vertical must surface drivers and every driver must have a full option pipeline
+    from services import load_verticals
+    for vk, vmeta in load_verticals().items():
+        assert ranked_drivers(vmeta["name"]), f"no drivers for {vmeta['name']}"
+    for d in load_drivers():
+        assert len(d["options"]) >= 2, f"driver {d['id']} needs >=2 options"
 
     at = stt.AppTest.from_file("app.py", default_timeout=30)
     at.run()

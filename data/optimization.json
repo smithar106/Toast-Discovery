@@ -1,5 +1,5 @@
 {
-  "_comment": "Revenue Optimization Plan — deterministic friction model + intervention options. Financial inputs are fictional case-study assumptions. All calculations happen in services/optimization.py.",
+  "_comment": "Revenue Optimization Plan \u2014 deterministic friction model + intervention options. Financial inputs are fictional case-study assumptions. All calculations happen in services/optimization.py.",
   "model": {
     "friction_score": "miss_rate * rework_probability * delay_days * annual_deals",
     "annual_opportunity": "annual_deals * miss_rate * rework_probability * delay_days * estimated_daily_revenue",
@@ -254,7 +254,7 @@
           "constraints": [
             "Adds a critical question to an already large grocery playbook",
             "EBT rules differ by state",
-            "Not all grocers accept SNAP — logic must be conditional"
+            "Not all grocers accept SNAP \u2014 logic must be conditional"
           ]
         },
         {
@@ -364,7 +364,7 @@
           "effort": "Low",
           "time_to_value": "Fast",
           "constraints": [
-            "Reps already ask this — change is process discipline",
+            "Reps already ask this \u2014 change is process discipline",
             "Merchants opening new sites may not have final counts",
             "Requires re-quoting process alignment"
           ]
@@ -563,6 +563,286 @@
             "Adds a review step before onboarding",
             "Needs onboarding team participation",
             "May delay aggressive commitments"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "scale_pricing",
+      "requirement": "Scale-Based Pricing",
+      "vertical": "meat_seafood",
+      "vertical_label": "Meat & Seafood",
+      "miss_rate": 0.13,
+      "delay_days": 9,
+      "annual_deals": 16,
+      "rework_probability": 0.7,
+      "estimated_daily_revenue": 2500,
+      "explanation": "Scale-based pricing drives hardware, PLU setup, and label workflows for meat and seafood counters; missed requirements surface as reconfiguration during staging.",
+      "options": [
+        {
+          "id": "scale_playbook",
+          "category": "prevent",
+          "name": "Make Scale-Based Pricing a Critical Requirement",
+          "proposed_solution": "Add scale-pricing and PLU-setup questions as critical requirements for meat & seafood merchants, with counter-specific conditional prompts.",
+          "reduction_pp": 6,
+          "effort": "Low",
+          "time_to_value": "Fast",
+          "constraints": [
+            "More questions for high-touch butcher counters",
+            "Scale and PLU setup varies by counter",
+            "Requires a maintained scale reference"
+          ]
+        },
+        {
+          "id": "scale_predict",
+          "category": "predict",
+          "name": "Pre-Flag From Deli & Seafood Volume",
+          "proposed_solution": "Use deli/seafood volume and counter signals from CRM to pre-flag scale-based pricing and prioritize it before the meeting.",
+          "reduction_pp": 9,
+          "effort": "Medium",
+          "time_to_value": "Medium",
+          "constraints": [
+            "Counter volume data is sparse in CRM",
+            "Requires reliable classification",
+            "False positives need monitoring"
+          ]
+        },
+        {
+          "id": "scale_preflight",
+          "category": "protect",
+          "name": "Scale Configuration Preflight Before Staging",
+          "proposed_solution": "Require scale-vendor and PLU confirmation before hardware staging for meat & seafood merchants.",
+          "reduction_pp": 12,
+          "effort": "Medium",
+          "time_to_value": "Medium",
+          "constraints": [
+            "Blocks staging when data is missing",
+            "Requires staging workflow integration",
+            "Merchant may not know PLU scope upfront"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "label_printing",
+      "requirement": "Label Printing",
+      "vertical": "meat_seafood",
+      "vertical_label": "Meat & Seafood",
+      "miss_rate": 0.11,
+      "delay_days": 8,
+      "annual_deals": 15,
+      "rework_probability": 0.65,
+      "estimated_daily_revenue": 2300,
+      "explanation": "Label printer hardware and template requirements are meat & seafood specific; gaps cause procurement and configuration delays near go-live.",
+      "options": [
+        {
+          "id": "label_playbook",
+          "category": "prevent",
+          "name": "Add Label Printer & Template Questions",
+          "proposed_solution": "Require label printer model and template workflow in the meat & seafood playbook, with conditional hardware questions.",
+          "reduction_pp": 7,
+          "effort": "Low",
+          "time_to_value": "Fast",
+          "constraints": [
+            "Adds a critical question per counter",
+            "Printer models vary and change",
+            "Requires a maintained hardware list"
+          ]
+        },
+        {
+          "id": "label_predict",
+          "category": "predict",
+          "name": "Pre-Suggest Hardware From Counter Type",
+          "proposed_solution": "Pre-populate recommended label hardware from counter type and volume data, surfaced for rep confirmation.",
+          "reduction_pp": 10,
+          "effort": "Medium",
+          "time_to_value": "Medium",
+          "constraints": [
+            "Counter-type data may be incomplete",
+            "Recommendations need rep confirmation",
+            "Requires a hardware sizing model"
+          ]
+        },
+        {
+          "id": "label_preflight",
+          "category": "protect",
+          "name": "Label Hardware Checkpoint Before Procurement",
+          "proposed_solution": "Add a deterministic checkpoint confirming label printer model per location before procurement for meat & seafood merchants.",
+          "reduction_pp": 13,
+          "effort": "Medium",
+          "time_to_value": "Medium",
+          "constraints": [
+            "Adds a step before procurement",
+            "Requires procurement workflow integration",
+            "Urgent merchants may feel the delay"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "gift_cards",
+      "requirement": "Gift Cards / Stored Value",
+      "vertical": "specialty_food",
+      "vertical_label": "Specialty Food",
+      "miss_rate": 0.12,
+      "delay_days": 7,
+      "annual_deals": 18,
+      "rework_probability": 0.5,
+      "estimated_daily_revenue": 2000,
+      "explanation": "Gift card and stored-value programs are common in specialty food but frequently captured late, adding configuration and reconciliation work after handoff.",
+      "options": [
+        {
+          "id": "giftcard_playbook",
+          "category": "prevent",
+          "name": "Add Gift Card Questions to the Playbook",
+          "proposed_solution": "Make gift card / stored value a structured requirement with program-type and reconciliation questions for specialty food merchants.",
+          "reduction_pp": 7,
+          "effort": "Low",
+          "time_to_value": "Fast",
+          "constraints": [
+            "Adds a question to specialty merchants",
+            "Program types vary by merchant",
+            "Reconciliation needs vary"
+          ]
+        },
+        {
+          "id": "giftcard_predict",
+          "category": "predict",
+          "name": "Pre-Flag Gift Card Merchants From Format",
+          "proposed_solution": "Use merchant format (artisan market, gift basket, online) to pre-flag gift card likelihood before the meeting.",
+          "reduction_pp": 10,
+          "effort": "Medium",
+          "time_to_value": "Medium",
+          "constraints": [
+            "Format classification must be reliable",
+            "Some merchants don't offer gift cards",
+            "Requires monitoring of false positives"
+          ]
+        },
+        {
+          "id": "giftcard_preflight",
+          "category": "protect",
+          "name": "Gift Card Confirmation Before Go-Live",
+          "proposed_solution": "Add a preflight check confirming gift card program details before go-live for specialty food merchants.",
+          "reduction_pp": 12,
+          "effort": "Medium",
+          "time_to_value": "Medium",
+          "constraints": [
+            "Blocks go-live when details are missing",
+            "Requires go-live workflow integration",
+            "Merchants may finalize program late"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "online_sales",
+      "requirement": "Online / Ecommerce Sales",
+      "vertical": "specialty_food",
+      "vertical_label": "Specialty Food",
+      "miss_rate": 0.13,
+      "delay_days": 9,
+      "annual_deals": 17,
+      "rework_probability": 0.6,
+      "estimated_daily_revenue": 2100,
+      "explanation": "Online and ecommerce sales are growing in specialty food; platform and fulfillment integration gaps add scoping and engineering work after handoff.",
+      "options": [
+        {
+          "id": "online_playbook",
+          "category": "prevent",
+          "name": "Add Ecommerce Platform Questions",
+          "proposed_solution": "Require ecommerce platform and fulfillment flow in the specialty food playbook, with per-platform conditional questions.",
+          "reduction_pp": 6,
+          "effort": "Low",
+          "time_to_value": "Fast",
+          "constraints": [
+            "Ecommerce platform landscape changes fast",
+            "Fulfillment flows vary by merchant",
+            "Requires a maintained integration catalog"
+          ]
+        },
+        {
+          "id": "online_predict",
+          "category": "predict",
+          "name": "Predict Ecommerce From Online Signals",
+          "proposed_solution": "Use merchant online presence signals to predict ecommerce integration likelihood and pre-populate the checklist.",
+          "reduction_pp": 9,
+          "effort": "High",
+          "time_to_value": "Slow",
+          "constraints": [
+            "Online presence signals are sparse in CRM",
+            "Requires integration catalog maintenance",
+            "Engineering dependency for prediction signals"
+          ]
+        },
+        {
+          "id": "online_preflight",
+          "category": "protect",
+          "name": "Ecommerce Scoping Gate Before Build",
+          "proposed_solution": "Require confirmed ecommerce platform before implementation scoping for specialty food merchants.",
+          "reduction_pp": 12,
+          "effort": "Medium",
+          "time_to_value": "Medium",
+          "constraints": [
+            "Adds a step before scoping",
+            "Requires engineering availability",
+            "Non-standard platforms are slow to scope"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "serial_tracking",
+      "requirement": "Serialized Tracking",
+      "vertical": "general_retail",
+      "vertical_label": "General Retail",
+      "miss_rate": 0.1,
+      "delay_days": 8,
+      "annual_deals": 20,
+      "rework_probability": 0.55,
+      "estimated_daily_revenue": 1900,
+      "explanation": "Serialized and lot tracking is critical for furniture and high-value retail; missed requirements cause catalog and configuration rework during rollout.",
+      "options": [
+        {
+          "id": "serial_playbook",
+          "category": "prevent",
+          "name": "Add Serialized Tracking Requirement",
+          "proposed_solution": "Make serialized / lot tracking a critical requirement for general retail merchants, with item-category conditional prompts.",
+          "reduction_pp": 7,
+          "effort": "Low",
+          "time_to_value": "Fast",
+          "constraints": [
+            "Adds a question to retail merchants",
+            "Only some categories need serials",
+            "Requires clear guidance on what to track"
+          ]
+        },
+        {
+          "id": "serial_predict",
+          "category": "predict",
+          "name": "Pre-Flag From Merchandise Mix",
+          "proposed_solution": "Use merchandise-mix signals from CRM to pre-flag serialized tracking for high-value categories before the meeting.",
+          "reduction_pp": 10,
+          "effort": "Medium",
+          "time_to_value": "Medium",
+          "constraints": [
+            "Merchandise-mix data is inconsistent",
+            "Requires a category model",
+            "Needs monitoring to avoid over-flagging"
+          ]
+        },
+        {
+          "id": "serial_preflight",
+          "category": "protect",
+          "name": "Serial Tracking Gate Before Rollout",
+          "proposed_solution": "Add a deterministic gate confirming serialized tracking scope before multi-site rollout begins.",
+          "reduction_pp": 13,
+          "effort": "Medium",
+          "time_to_value": "Medium",
+          "constraints": [
+            "Delays rollout until scope is confirmed",
+            "Requires rollout workflow integration",
+            "Merchants may not know scope across sites"
           ]
         }
       ]
