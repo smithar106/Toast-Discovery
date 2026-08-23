@@ -9,7 +9,7 @@
       "rep_id": "maya_chen",
       "stage": "Discovery",
       "opportunity_value": 48000,
-      "meeting_date": "2026-08-24",
+      "meeting_date": "2026-08-26",
       "meeting_time": "10:00 AM",
       "meeting_type": "In-person",
       "primary_contact": {
@@ -213,7 +213,7 @@
       "rep_id": "priya_raman",
       "stage": "Discovery",
       "opportunity_value": 210000,
-      "meeting_date": "2026-08-25",
+      "meeting_date": "2026-08-24",
       "meeting_time": "9:00 AM",
       "meeting_type": "Video",
       "primary_contact": {
@@ -317,7 +317,7 @@
       "stage": "Discovery",
       "opportunity_value": 39000,
       "meeting_date": "2026-08-25",
-      "meeting_time": "2:00 PM",
+      "meeting_time": "9:00 AM",
       "meeting_type": "In-person",
       "primary_contact": {
         "name": "Hector Ruiz",
@@ -412,7 +412,7 @@
       "rep_id": "jordan_ellis",
       "stage": "Discovery",
       "opportunity_value": 88000,
-      "meeting_date": "2026-08-26",
+      "meeting_date": "2026-08-27",
       "meeting_time": "11:00 AM",
       "meeting_type": "Video",
       "primary_contact": {
@@ -518,8 +518,8 @@
       "rep_id": "maya_chen",
       "stage": "Discovery",
       "opportunity_value": 54000,
-      "meeting_date": "2026-08-26",
-      "meeting_time": "3:30 PM",
+      "meeting_date": "2026-08-28",
+      "meeting_time": "9:00 AM",
       "meeting_type": "Phone",
       "primary_contact": {
         "name": "Ruth Ellison",
@@ -617,7 +617,7 @@
       "stage": "Discovery",
       "opportunity_value": 96000,
       "meeting_date": "2026-08-27",
-      "meeting_time": "10:30 AM",
+      "meeting_time": "2:30 PM",
       "meeting_type": "In-person",
       "primary_contact": {
         "name": "Amara Toussaint",
@@ -699,8 +699,8 @@
       "rep_id": "sofia_reyes",
       "stage": "Discovery",
       "opportunity_value": 31000,
-      "meeting_date": "2026-08-28",
-      "meeting_time": "9:30 AM",
+      "meeting_date": "2026-08-25",
+      "meeting_time": "1:30 PM",
       "meeting_type": "Video",
       "primary_contact": {
         "name": "Kenji Morita",

@@ -91,6 +91,7 @@ def _render_playbook() -> None:
             """,
             unsafe_allow_html=True,
         )
+        _render_bottom_back()
         return
 
     _render_context_brief(merchant, answers, evaluation)
@@ -98,6 +99,14 @@ def _render_playbook() -> None:
     evaluation = evaluate_merchant(merchant, answers)
     _render_additional_context(merchant, answers, evaluation)
     _render_submission(merchant, answers, evaluation, notes_key)
+    _render_bottom_back()
+
+
+def _render_bottom_back() -> None:
+    st.markdown('<div style="height:0.6rem;"></div>', unsafe_allow_html=True)
+    if st.button("Back to agenda", width="stretch"):
+        st.session_state["rep_view"] = "home"
+        st.rerun()
 
 
 def _render_header(merchant: dict, vname: str, evaluation: dict) -> None:
