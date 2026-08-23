@@ -47,9 +47,17 @@ def render() -> None:
     _render_trends(df)
 
     st.markdown('<div class="section-title" style="margin-top:1rem;">Where requirements fail</div>', unsafe_allow_html=True)
+    st.markdown(
+        '<div style="font-size:0.82rem; margin-bottom:0.5rem;">The governed requirements most often missed at submission — and the rework they cause downstream.</div>',
+        unsafe_allow_html=True,
+    )
     _render_gap_analysis(df)
 
     st.markdown('<div class="section-title" style="margin-top:1rem;">Vertical performance</div>', unsafe_allow_html=True)
+    st.markdown(
+        '<div style="font-size:0.82rem; margin-bottom:0.5rem;">First-pass completeness and clarification by vertical — where vertical-specific playbooks are working or leaking.</div>',
+        unsafe_allow_html=True,
+    )
     _render_vertical(df)
 
     st.markdown('<div class="section-title" style="margin-top:1rem;">Rep / team view</div>', unsafe_allow_html=True)
@@ -253,6 +261,10 @@ def _render_gap_analysis(df: pd.DataFrame) -> None:
         unsafe_allow_html=True,
     )
     dfm = pd.DataFrame(data["missed_requirements"])
+    st.markdown(
+        '<div style="font-size:0.82rem; margin-bottom:0.4rem;">Share of discoveries submitted without each requirement — the higher the bar, the more preventable rework.</div>',
+        unsafe_allow_html=True,
+    )
     m.bar_chart(dfm, "requirement", "miss_rate", "Miss rate by requirement (%)",
                 color_col="downstream_impact",
                 colors=["#B42318", "#B7791F", "#2F5FA8", "#B42318", "#B42318", "#B7791F", "#B7791F"])
@@ -293,11 +305,6 @@ def _render_reps(df: pd.DataFrame) -> None:
     if df.empty:
         st.warning("No records match the current filters.")
         return
-    st.markdown(
-        '<div class="faint small" style="margin-bottom:0.5rem;">Framed as operational coaching — trends highlight '
-        'where to reinforce the playbook, not to punish individuals.</div>',
-        unsafe_allow_html=True,
-    )
     rdf = (
         df.groupby(["rep"])
         .agg(

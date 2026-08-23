@@ -10,8 +10,8 @@ ACCENT = "#D94F2B"          # warm terracotta
 ACCENT_HOVER = "#C4461F"
 ACCENT_SOFT = "#FBEFE9"     # washed accent
 INK = "#1A1D21"             # near-black text
-MUTED = "#6A7076"           # secondary text
-FAINT = "#9AA0A6"           # tertiary text
+MUTED = "#1A1D21"           # secondary text (black — no grey in this UI)
+FAINT = "#1A1D21"           # tertiary text (black)
 BORDER = "#E4E6E8"          # hairline
 BORDER_STRONG = "#D4D7DA"
 BG = "#F7F7F5"              # app background
@@ -76,7 +76,7 @@ def apply_theme() -> None:
         .muted {{ color: {MUTED}; }}
         .faint {{ color: {FAINT}; }}
         .small {{ font-size: 0.82rem; }}
-        .section-title {{ font-size: 0.78rem; font-weight: 650; letter-spacing: 0.06em; text-transform: uppercase; color: {MUTED}; margin: 0 0 0.4rem 0; }}
+        .section-title {{ font-size: 0.78rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: {INK}; margin: 0 0 0.4rem 0; }}
         .divider {{ border-top: 1px solid {BORDER}; margin: 1rem 0; }}
 
         /* ---- Panels (typography-led, minimal borders) ---- */
