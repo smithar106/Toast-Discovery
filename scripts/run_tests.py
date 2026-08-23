@@ -112,10 +112,45 @@ def test_control_center():
     print("  control center: renders + segmentation filters react = True")
 
 
+def test_revenue_optimization_flow():
+    from services.optimization import ranked_drivers, friction_score, annual_opportunity
+
+    drivers = ranked_drivers("All")
+    assert drivers[0]["id"] == "age_verification", "age verification should rank first"
+    assert annual_opportunity(drivers[0]) > 0
+
+    at = stt.AppTest.from_file("app.py", default_timeout=30)
+    at.run()
+    at.radio[0].set_value("RevOps").run()
+    at.radio[0].set_value("Revenue Optimization Plan").run()
+    assert not at.exception
+    # vertical filter
+    [x for x in at.selectbox if x.label == "Vertical"][0].set_value("Convenience + Fuel").run()
+    assert not at.exception
+    # open age verification detail
+    [x for x in at.button if x.key == "opt_open_age_verification"][0].click().run()
+    assert not at.exception
+    md = " ".join(m.value for m in at.markdown)
+    assert "Current state" in md and "OPTION 1" in md and "OPTION 3" in md
+    # select approach
+    [x for x in at.button if x.key == "opt_select_strengthen_playbook"][0].click().run()
+    assert not at.exception
+    md = " ".join(m.value for m in at.markdown)
+    assert "Proposed optimization" in md and "Primary constraint" in md
+    # send draft plan
+    [x for x in at.button if "Send Draft Project Plan" in x.label][0].click().run()
+    assert not at.exception
+    md = " ".join(m.value for m in at.markdown)
+    assert "Preview project plan" in md
+    assert "Optimization decisions" in md and "Draft plan sent" in md
+    assert "fictional case-study assumptions" in md
+    print("  revenue optimization: landing -> detail -> options -> decision -> plan -> history = True")
+
+
 if __name__ == "__main__":
     tests = [test_deterministic_validation, test_ai_facts_need_confirmation,
              test_handoff_includes_age_verification, test_route9_ui_walkthrough,
-             test_control_center]
+             test_control_center, test_revenue_optimization_flow]
     for t in tests:
         t()
     print("\nAll prototype tests passed.")

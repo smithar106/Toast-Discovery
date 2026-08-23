@@ -147,3 +147,53 @@ def _fallback_summary(merchant, answers, notes) -> str:
     else:
         parts.append("Rep captured additional merchant context during the meeting.")
     return " ".join(parts)
+
+
+# ---------------------------------------------------------------------------
+# Revenue Optimization Plan — AI enhancement (with deterministic fallback)
+# ---------------------------------------------------------------------------
+
+_CATEGORY_SUMMARY = {
+    "prevent": "Improve discovery itself so the requirement is surfaced during the meeting.",
+    "predict": "Use merchant context and CRM data to flag the requirement earlier.",
+    "protect": "Add a validation or workflow safeguard before handoff.",
+}
+
+
+def explain_friction(driver: dict) -> str:
+    """Human explanation of a friction driver. LLM may enhance; fallback is deterministic."""
+    if not OPENAI_KEY:
+        return driver["explanation"]
+    prompt = (
+        f"Rewrite in 2 sentences why '{driver['requirement']}' for {driver['vertical_label']} merchants "
+        f"creates discovery friction and downstream rework. Base context: {driver['explanation']}. "
+        f"Do not mention dollar figures. Plain text, no markdown."
+    )
+    out = _chat([{"role": "user", "content": prompt}])
+    return out.strip() if out else driver["explanation"]
+
+
+def explain_option(driver: dict, option: dict) -> str:
+    """Short 'why this approach' note for an option card. Fallback is category-driven."""
+    if not OPENAI_KEY:
+        return _CATEGORY_SUMMARY.get(option["category"], option["name"])
+    prompt = (
+        f"In one sentence, explain why '{option['name']}' (category: {option['category']}) is a credible "
+        f"intervention for reducing '{driver['requirement']}' friction in {driver['vertical_label']} discovery. "
+        f"Plain text, no markdown, no numbers."
+    )
+    out = _chat([{"role": "user", "content": prompt}])
+    return out.strip() if out else _CATEGORY_SUMMARY.get(option["category"], option["name"])
+
+
+def draft_plan_narrative(driver: dict, option: dict, plan: dict) -> str:
+    """Optional narrative framing for the project plan. Fallback returns an empty string
+    (the deterministic markdown plan stands on its own)."""
+    if not OPENAI_KEY:
+        return ""
+    prompt = (
+        f"Write a 2-3 sentence executive summary of a project plan to reduce '{driver['requirement']}' "
+        f"friction via '{option['name']}'. Constraint: do not compute or state any dollar figures. Plain text."
+    )
+    out = _chat([{"role": "user", "content": prompt}])
+    return out.strip() if out else ""

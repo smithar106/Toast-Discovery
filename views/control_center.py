@@ -1,7 +1,8 @@
-"""RevOps Director Control Center — Discovery-to-Handoff System Health.
+"""RevOps Director Control Center.
 
-Exception-first design: primary KPIs and an "Attention this week" panel answer
-"What needs my attention?" before trends and deeper analytics.
+Two workspaces behind one header:
+  - System Health: discovery-to-handoff operational metrics.
+  - Revenue Optimization Plan: turn friction signals into Director decisions.
 """
 from __future__ import annotations
 
@@ -11,11 +12,23 @@ import streamlit as st
 from components import metrics as m
 from components import ui
 from services import load_metrics, load_records, load_requirements, load_verticals
+from views import revenue_optimization
 
 _PRIMARY_KPIS = ["first_pass_complete", "deals_critical_gaps", "clarification_rate", "median_time_to_handoff"]
 
 
 def render() -> None:
+    tab = st.radio(
+        "Director view",
+        ["System Health", "Revenue Optimization Plan"],
+        key="director_view",
+        horizontal=True,
+        label_visibility="collapsed",
+    )
+    if tab == "Revenue Optimization Plan":
+        revenue_optimization.render()
+        return
+
     data = load_metrics()
     records = load_records()
 

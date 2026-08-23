@@ -39,6 +39,7 @@ Two ideas govern the architecture:
 | Critical-gap analysis, vertical & rep performance | Control Center |
 | Governed requirements library + governance activity | Control Center |
 | Insight panel ("what I'd investigate this week") | Control Center |
+| Revenue Optimization Plan — top friction drivers, 3 interventions each, Director decision → draft project plan | Revenue Optimization |
 
 **Flagship demo:** *Route 9 Fuel & Grab.* The merchant is 90% there but **age verification was never discussed** — the exact failure that historically caused rework and escalation. The playbook makes the gap impossible to miss, the rep answers it, conditional questions appear, discovery completes, and the onboarding handoff explicitly carries the confirmed age-verification requirement.
 
@@ -73,7 +74,8 @@ Toast-Discovery/
 │
 ├── views/
 │   ├── sales_rep.py            # View 1
-│   └── control_center.py       # View 2
+│   ├── control_center.py       # View 2 (System Health + Revenue Optimization tabs)
+│   └── revenue_optimization.py # Director decision workspace
 │
 ├── components/
 │   ├── ui.py                   # shared visual system
@@ -86,6 +88,7 @@ Toast-Discovery/
 │   ├── __init__.py             # data loading
 │   ├── discovery_engine.py     # requirement assembly + conditions
 │   ├── validation.py           # deterministic completeness rules
+│   ├── optimization.py         # friction model + project plan generator (deterministic)
 │   ├── ai_service.py           # optional LLM + demo fallback
 │   └── handoff_service.py      # handoff generation
 │
@@ -95,7 +98,8 @@ Toast-Discovery/
 │   ├── verticals.json          # vertical metadata
 │   ├── reps.json               # fictional sales reps
 │   ├── metrics.json            # KPI targets, insights, governance events
-│   └── records.json            # generated mock operational records
+│   ├── records.json            # generated mock operational records
+│   └── optimization.json       # friction drivers + intervention options
 │
 ├── scripts/
 │   ├── generate_records.py     # deterministic mock record generator (data tool)
@@ -138,7 +142,7 @@ Open the printed URL. **No API key is required** — the app runs fully offline 
 python scripts/run_tests.py
 ```
 
-Covers the Route 9 walkthrough, deterministic validation, the AI-confirmation rule, handoff generation, and Control Center segmentation reactivity.
+Covers the Route 9 walkthrough, deterministic validation, the AI-confirmation rule, handoff generation, Control Center segmentation reactivity, and the Revenue Optimization decision flow.
 
 ### Optional: enable LLM features
 
@@ -190,6 +194,12 @@ streamlit run app.py --server.address=0.0.0.0 --server.port=$PORT --server.headl
 12. **Filter to Convenience + Fuel** — charts, tables, and the KPI row react.
 13. **Where requirements fail** shows age verification as the most commonly missed requirement.
 14. Open **Governed requirements** — see owners, versions, and rules; explain how leadership closes the loop.
+15. Switch to the **Revenue Optimization Plan** tab.
+16. See **Top Revenue Friction Drivers**; **Age Verification** ranks first.
+17. Open it → **Current state** (miss rate, delay, affected deals, modeled annual opportunity).
+18. Compare **three interventions** (prevent / predict / protect) with modeled impact + constraints.
+19. Select **Strengthen the Discovery Playbook** → review the **Proposed Optimization**.
+20. Click **Send Draft Project Plan via Email to Me** → simulated email, full project plan, and the decision appears in **Optimization Decisions**.
 
 ---
 
