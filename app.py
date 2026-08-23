@@ -65,10 +65,6 @@ def _sidebar() -> None:
             )
         st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
         st.markdown(
-            '<div class="faint small">Know what you cannot afford to leave without knowing.</div>',
-            unsafe_allow_html=True,
-        )
-        st.markdown(
             '<div class="foot" style="margin-top:1rem;">Demo data is fictional and created for this case study.</div>',
             unsafe_allow_html=True,
         )

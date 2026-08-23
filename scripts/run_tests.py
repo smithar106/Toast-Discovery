@@ -103,8 +103,8 @@ def test_control_center():
     weekbox = [s for s in at.selectbox if s.label == "Week"][0]
     weekbox.set_value("08/02/2026").run()
     assert not at.exception
-    caps = [c.value for c in at.caption]
-    assert caps and any("discoveries" in c for c in caps), "week filter updates record count"
+    md = " ".join(m.value for m in at.markdown)
+    assert "submitted discoveries in this view" in md, "week filter updates record count"
     # vertical filter + dataframes render
     [x for x in at.selectbox if x.label == "Vertical"][0].set_value("Convenience + Fuel").run()
     assert not at.exception

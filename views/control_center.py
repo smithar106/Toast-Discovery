@@ -22,7 +22,6 @@ def render() -> None:
     ui.page_header(
         "RevOps · Control center",
         "Discovery-to-handoff system health",
-        "Know what you cannot afford to leave without knowing — at portfolio scale.",
     )
     st.markdown(
         f'<div class="faint small" style="margin-bottom:0.9rem;">As of {data["as_of_week"]} · mock operational data for this case study</div>',
@@ -43,13 +42,6 @@ def render() -> None:
 
     st.markdown('<div class="section-title" style="margin-top:1rem;">Segmentation</div>', unsafe_allow_html=True)
     _render_filters(records)
-    st.markdown(
-        f'<div class="faint small" style="margin-bottom:0.6rem;">'
-        f'{st.session_state.get("cc_vertical","All")} · {st.session_state.get("cc_rep","All")} · '
-        f'{st.session_state.get("cc_region","All")} · {st.session_state.get("cc_size","All")} · '
-        f'from {st.session_state.get("cc_from_week","All")} · {len(df)} records</div>',
-        unsafe_allow_html=True,
-    )
 
     st.markdown('<div class="section-title" style="margin-top:1rem;">Trends</div>', unsafe_allow_html=True)
     _render_trends(df)
@@ -212,7 +204,11 @@ def _render_trends(df: pd.DataFrame) -> None:
     weekly["time_to_live"] = weekly["time_to_live"].round(0)
     weekly["deals"] = weekly["deals"].astype(int)
     weekly = weekly.rename(columns={"week_label": "label"})
-    st.caption(f"{weekly['deals'].sum()} submitted discoveries in this view")
+    st.markdown(
+        f'<div style="font-weight:700; color:{ui.INK}; font-size:0.85rem; margin-bottom:0.4rem;">'
+        f'{weekly["deals"].sum()} submitted discoveries in this view</div>',
+        unsafe_allow_html=True,
+    )
     w = weekly.to_dict("records")
 
     c1, c2 = st.columns(2, gap="small")

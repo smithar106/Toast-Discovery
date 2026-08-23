@@ -35,7 +35,6 @@ def render() -> None:
     ui.page_header(
         "Sales · This week",
         "Discovery agenda",
-        "Know what you cannot afford to leave without knowing.",
     )
     st.markdown(
         f'<div class="muted small" style="margin-bottom:0.9rem;">Rep: <b style="color:{ui.INK};">Maya Chen</b> · '
@@ -53,12 +52,6 @@ def render() -> None:
     for merchant in sorted_m:
         answers = _init_session(merchant)
         merchant_card.merchant_card(merchant, answers)
-    st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
-    st.markdown(
-        '<div class="foot">Critical items are the information that can change viability, implementation design, '
-        'or cause rework. That is what this agenda keeps front of mind.</div>',
-        unsafe_allow_html=True,
-    )
 
 
 def _render_playbook() -> None:
@@ -253,7 +246,7 @@ def _render_submission(merchant: dict, answers: dict, evaluation: dict, notes_ke
         st.markdown(
             f'<div class="panel" style="border:1px solid #F2D8D4; background:#FDF6F5; padding:0.9rem 1rem;">'
             f'<div class="section-title" style="color:{ui.RED};">Before you leave · {n} critical item{"s" if n != 1 else ""} remain</div>'
-            f'<div class="small muted" style="margin-top:0.15rem;">You cannot afford to leave without knowing these:</div>'
+            f'<div class="small muted" style="margin-top:0.15rem;">Resolve these before finishing:</div>'
             f'<ul style="margin:0.45rem 0 0 1.1rem; color:{ui.INK};">{items}</ul>'
             f'</div>',
             unsafe_allow_html=True,

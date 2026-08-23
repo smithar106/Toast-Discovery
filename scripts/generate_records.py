@@ -100,5 +100,15 @@ for week_idx, (week, label) in enumerate(WEEKS):
                 })
 
 out = {"generated": True, "records": RECORDS}
+
+# Keep the dataset a clean, stable total (drop oldest records if needed so the
+# headline count reads 2026, matching the data year).
+TARGET = 2026
+if len(RECORDS) > TARGET:
+    RECORDS = RECORDS[len(RECORDS) - TARGET:]
+    out["records"] = RECORDS
+    for i, r in enumerate(RECORDS):
+        r["id"] = i + 1
+
 (ROOT / "data" / "records.json").write_text(json.dumps(out, indent=2))
 print(f"wrote {len(RECORDS)} records to data/records.json")
