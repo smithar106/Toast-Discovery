@@ -98,7 +98,8 @@ def test_control_center():
     at.run()
     at.radio[0].set_value("RevOps").run()
     assert not at.exception
-    assert len(at.selectbox) == 6, "vertical, rep, region, size, week, governance filters"
+    assert len(at.selectbox) == 5, "vertical, rep, region, size, week filters"
+    assert "Governed requirements" not in " ".join(m.value for m in at.markdown)
     # week filter present + reacts
     weekbox = [s for s in at.selectbox if s.label == "Week"][0]
     weekbox.set_value("08/02/2026").run()

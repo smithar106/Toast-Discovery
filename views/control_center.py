@@ -11,7 +11,7 @@ import streamlit as st
 
 from components import metrics as m
 from components import ui
-from services import load_metrics, load_records, load_requirements, load_verticals
+from services import load_metrics, load_records, load_verticals
 from views import revenue_optimization
 
 _PRIMARY_KPIS = ["first_pass_complete", "deals_critical_gaps", "clarification_rate", "median_time_to_handoff"]
@@ -76,16 +76,9 @@ def render() -> None:
     st.markdown('<div class="section-title" style="margin-top:1rem;">Rep / team view</div>', unsafe_allow_html=True)
     _render_reps(df)
 
-    st.markdown('<div class="section-title" style="margin-top:1rem;">Governed requirements</div>', unsafe_allow_html=True)
-    _render_governance(data)
-
-    st.markdown('<div class="section-title" style="margin-top:1rem;">What I would investigate this week</div>',
-                unsafe_allow_html=True)
-    _render_insights(data)
-
     st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
     st.markdown(
-        '<div class="foot">The control center exists so leadership can see whether governed requirements are '
+        '<div class="foot">The control center exists so leadership can see whether discovery-to-handoff is '
         'creating measurable operational value — and where the playbook should evolve next.</div>',
         unsafe_allow_html=True,
     )
@@ -337,57 +330,3 @@ def _render_reps(df: pd.DataFrame) -> None:
         ["Rep", "Deals", "First-pass %", "Critical gap %", "Clarification %", "Time to handoff (d)"]]
     st.dataframe(disp, hide_index=True, width="stretch")
     m.bar_chart(rdf, "rep", "First-pass %", "First-pass completeness by rep (%)")
-
-
-def _render_governance(data: dict) -> None:
-    verticals = load_verticals()
-    vnames = {k: v["name"] for k, v in verticals.items()}
-    options = ["All"] + list(vnames.values())
-    sel = st.selectbox("Filter requirements by vertical", options, key="gov_vertical")
-    sel_key = None
-    if sel != "All":
-        sel_key = next((k for k, v in vnames.items() if v == sel), None)
-
-    reqs = load_requirements()
-    rows = []
-    for r in reqs:
-        if sel_key is not None and r.get("vertical") not in ("all", sel_key):
-            continue
-        prio = "critical" if r.get("priority") == "critical" else "important"
-        badge = ui.status_badge(prio)
-        rows.append(
-            f'<div class="row" style="padding:0.45rem 1rem;">'
-            f'<span style="flex:1; min-width:0;"><b style="font-size:0.88rem;">{r["label"]}</b>'
-            f'<div class="faint small">{r.get("rule", "")} · Owner: {r.get("owner", "")} · {r.get("version", "")}</div></span>'
-            f'<span style="display:flex; gap:0.5rem; align-items:center; flex-shrink:0;">'
-            f'<span class="chip chip-neutral">{r.get("vertical") if r.get("vertical") != "all" else "All"}</span>'
-            f'<span class="{badge}">{prio.title()}</span>'
-            f'<span class="faint small">{r.get("last_updated", "")}</span></span></div>'
-        )
-    st.markdown(f'<div class="panel-flush" style="margin-bottom:0.6rem;">{"".join(rows)}</div>', unsafe_allow_html=True)
-
-    if st.button("Edit requirement (mock)", width="content"):
-        st.markdown(
-            '<div class="panel" style="margin-top:0.6rem;"><div class="section-title">Edit requirement</div>'
-            '<div class="small muted">This is a prototype — editing persists only for this session and represents '
-            'the change-control workflow leadership would use to evolve the playbook.</div></div>',
-            unsafe_allow_html=True,
-        )
-
-    st.markdown('<div class="section-title" style="margin-top:0.8rem;">Governance activity (recent)</div>',
-                unsafe_allow_html=True)
-    for ev in data["governance_events"][::-1]:
-        st.markdown(
-            f'<div class="attention" style="border-left-color:{ui.ACCENT}; padding:0.55rem 0.85rem; margin-bottom:0.5rem;">'
-            f'<span class="faint small">{ev["date"]} · {ev["owner"]}</span><div style="font-size:0.88rem;">{ev["change"]}</div></div>',
-            unsafe_allow_html=True,
-        )
-
-
-def _render_insights(data: dict) -> None:
-    for note in data["insights"]:
-        st.markdown(
-            f'<div class="attention" style="border-left-color:{ui.ACCENT}; padding:0.6rem 0.85rem; margin-bottom:0.5rem;">'
-            f'<div style="font-size:0.88rem; color:{ui.INK};">{note}</div></div>',
-            unsafe_allow_html=True,
-        )

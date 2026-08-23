@@ -237,19 +237,3 @@ def page_header(eyebrow: str, title: str, subtitle: str = "") -> None:
 
 def chip(text: str, kind: str = "neutral") -> str:
     return f'<span class="chip chip-{kind}">{text}</span>'
-
-
-def status_badge(status: str) -> str:
-    styles = {
-        "complete": "chip chip-green",
-        "in_progress": "chip chip-amber",
-        "needs_attention": "chip chip-red",
-        "critical": "chip chip-red",
-        "important": "chip chip-amber",
-        "info": "chip chip-blue",
-        "known": "chip chip-blue",
-        "ai": "chip chip-accent",
-        "confirmed": "chip chip-green",
-        "submitted": "chip chip-blue",
-    }
-    return styles.get(status, "chip chip-neutral")
