@@ -65,6 +65,7 @@ record_id = 0
 
 for week_idx, (week, label) in enumerate(WEEKS):
     improvement = week_idx * 0.015  # steady system-wide improvement
+    ttl_improvement = week_idx * 0.6  # downstream go-live speed-up as discovery improves
     for vert_key, vert_label in VERTICALS.items():
         for rep_id, rep_name, region in REPS:
             n_deals = random.randint(3, 9)
@@ -76,8 +77,8 @@ for week_idx, (week, label) in enumerate(WEEKS):
                 first_pass = random.random() < fp_base
                 clarification = (not first_pass) or random.random() < cl_base
                 tth = max(0.9, round(random.gauss(1.9, 0.5) + (0.4 if clarification else 0), 1))
-                ttl = max(8, round(random.gauss(19, 3) + (2.5 if clarification else 0)))
-                reengage = 1 if (clarification and random.random() < 0.55) else 0
+                ttl = max(8, round(random.gauss(19, 3) + (2.5 if clarification else 0) - ttl_improvement))
+                reengage = 1 if (clarification and random.random() < 0.55 - improvement * 0.6) else 0
                 gaps = random.randint(0, 3) if not first_pass else 0
                 RECORDS.append({
                     "id": record_id,

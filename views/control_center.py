@@ -225,19 +225,67 @@ def _render_trends(df: pd.DataFrame) -> None:
     )
     w = weekly.to_dict("records")
 
+    _render_trend_summary(w)
+
+    # Causal funnel: discovery quality -> downstream friction -> seller capacity -> merchant outcome
+    cfg = [
+        {"key": "first_pass", "label": "First-pass completeness", "unit": "%",
+         "higher_better": True, "target": 85, "stage": "Discovery quality"},
+        {"key": "clarification", "label": "Clarification / rework", "unit": "%",
+         "higher_better": False, "target": 10, "stage": "Downstream friction"},
+        {"key": "reengagement", "label": "Rep re-engagement", "unit": "%",
+         "higher_better": False, "target": 5, "stage": "Seller capacity"},
+        {"key": "time_to_live", "label": "Time to live", "unit": "days",
+         "higher_better": False, "target": 15, "stage": "Merchant outcome"},
+    ]
+
+    # Row 1: Discovery quality | Downstream friction
     c1, c2 = st.columns(2, gap="small")
     with c1:
-        m.trend_chart(w, "first_pass", "First-pass completeness (%)", "%")
+        m.trend_card(w, "first_pass", cfg[0])
     with c2:
-        m.trend_chart(w, "clarification", "Clarification / rework (%)", "%")
+        m.trend_card(w, "clarification", cfg[1])
 
+    st.markdown(
+        '<div style="text-align:center; color:#8A9096; font-size:0.78rem; margin:0.15rem 0;">'
+        'Better discovery → fewer clarifications → less re-engagement → faster go-live</div>',
+        unsafe_allow_html=True,
+    )
+
+    # Row 2: Seller capacity | Merchant outcome
     c3, c4 = st.columns(2, gap="small")
     with c3:
-        m.trend_chart(w, "time_to_handoff", "Time to handoff (days)", "days")
+        m.trend_card(w, "reengagement", cfg[2])
     with c4:
-        m.trend_chart(w, "reengagement", "Rep re-engagement after handoff (%)", "%")
+        m.trend_card(w, "time_to_live", cfg[3])
 
-    m.trend_chart(w, "time_to_live", "Time to live (days)", "days")
+    st.markdown('<div class="section-title" style="margin-top:0.6rem;">Secondary</div>', unsafe_allow_html=True)
+    m.sparkline(w, "time_to_handoff", {
+        "label": "Time to handoff", "unit": "days",
+        "higher_better": False, "target": 1.5,
+    })
+
+
+def _render_trend_summary(w: list[dict]) -> None:
+    """One-line 'since baseline' summary so the whole story reads in seconds."""
+    first = w[0]
+    last = w[-1]
+    def _delta(key, unit, higher_better):
+        v = float(last[key]) - float(first[key])
+        arrow = "↑" if v > 0 else ("↓" if v < 0 else "→")
+        tone = ui.GREEN if ((v > 0) == higher_better and v != 0) else ui.RED
+        sep = "" if unit in ("", "%") else " "
+        return f'<span style="color:{tone}; font-weight:600;">{arrow} {abs(v):g}{sep}{unit}</span>'
+
+    st.markdown(
+        f'<div class="panel" style="padding:0.6rem 1rem; margin-bottom:0.8rem;">'
+        f'<span style="font-weight:650; color:{ui.INK}; margin-right:0.5rem;">Since baseline</span>'
+        f'<span style="font-size:0.86rem;">First-pass completeness {_delta("first_pass","%",True)} · '
+        f'Clarification {_delta("clarification","%",False)} · '
+        f'Sales re-engagement {_delta("reengagement","%",False)} · '
+        f'Time to live {_delta("time_to_live","days",False)}</span></div>',
+        unsafe_allow_html=True,
+    )
 
 
 def _render_gap_analysis(df: pd.DataFrame) -> None:

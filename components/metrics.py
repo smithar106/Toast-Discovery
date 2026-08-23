@@ -65,22 +65,131 @@ def render_kpi_row(kpis: dict) -> None:
     st.write("")
 
 
-def trend_chart(weekly: list[dict], metric_key: str, title: str, y_title: str) -> None:
+def trend_card(weekly: list[dict], metric_key: str, cfg: dict) -> None:
+    """Causal-funnel trend card: directional title, value + delta since baseline,
+    and a chart with a target reference line.
+
+    cfg keys: label, unit, higher_better, target, stage (e.g. 'Discovery quality').
+    """
     df = pd.DataFrame(weekly)
+    values = df[metric_key].tolist()
+    current = float(values[-1])
+    baseline = float(values[0])
+    delta = current - baseline
+    unit = cfg.get("unit", "")
+    sep = "" if unit in ("", "%") else " "
+    display = f"{current:g}{sep}{unit}"
+
+    target = cfg.get("target")
+    higher_better = cfg.get("higher_better", True)
+    direction = "↑" if higher_better else "↓"
+    target_dir = "≥" if higher_better else "≤"
+
+    good = (current >= target) if higher_better else (current <= target)
+    delta_good = (delta > 0) if higher_better else (delta < 0)
+    delta_color = ui.GREEN if delta_good else ui.RED
+    delta_arrow = "↑" if delta > 0 else ("↓" if delta < 0 else "→")
+    delta_pp = unit == "%"
+
+    if delta_pp:
+        delta_text = f"{delta_arrow} {abs(delta):g}pp since baseline"
+    else:
+        delta_text = f"{delta_arrow} {abs(delta):g} {unit} since baseline"
+
+    stage = cfg.get("stage", "")
+    value_color = ui.GREEN if good else ui.INK
+
+    st.markdown(
+        f"""
+        <div class="panel" style="margin-bottom:0.6rem; padding:0.75rem 1rem;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:0.75rem; flex-wrap:wrap;">
+                <div>
+                    <div class="faint small" style="font-size:0.7rem; letter-spacing:0.07em; text-transform:uppercase; font-weight:600;">{stage}</div>
+                    <div style="font-weight:650; font-size:0.98rem; color:{ui.INK}; margin-top:0.1rem;">
+                        {cfg['label']} {direction} <span class="faint small">· {('Higher' if higher_better else 'Lower')} is better · Target {target_dir} {target:g}{sep}{unit}</span>
+                    </div>
+                </div>
+                <div style="text-align:right;">
+                    <span style="font-weight:700; font-size:1.35rem; color:{value_color};">{display}</span>
+                    <div style="font-size:0.78rem; color:{delta_color}; font-weight:600;">{delta_text}</div>
+                </div>
+            </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
     fig = px.line(
-        df, x="label", y=metric_key, title=title, markers=True,
+        df, x="label", y=metric_key, markers=True,
         color_discrete_sequence=[ui.ACCENT],
     )
+    if target is not None:
+        fig.add_hline(
+            y=target, line_dash="dash", line_color="#B9BEC4", line_width=1,
+            annotation_text=f"target {target:g}{sep}{unit}",
+            annotation_position="top left",
+            annotation_font=dict(size=10, color="#8A9096"),
+        )
     fig.update_layout(
-        height=280, margin=dict(l=10, r=10, t=40, b=10),
-        font=dict(family="Inter, sans-serif", size=12),
+        height=200, margin=dict(l=8, r=8, t=24, b=8),
+        font=dict(family="Inter, sans-serif", size=11),
         paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-        title_font=dict(size=14, color=ui.INK),
-        yaxis_title=y_title, xaxis_title="",
+        showlegend=False, yaxis_title="", xaxis_title="",
         hovermode="x unified",
     )
-    fig.update_traces(line_width=2.5, marker_size=6)
+    fig.update_traces(line_width=2.2, marker_size=5)
     st.plotly_chart(fig, width="stretch")
+    st.markdown("</div>", unsafe_allow_html=True)
+
+
+def sparkline(weekly: list[dict], metric_key: str, cfg: dict) -> None:
+    """Compact secondary chart (e.g. time to handoff): value + delta + tiny line."""
+    df = pd.DataFrame(weekly)
+    values = df[metric_key].tolist()
+    current = float(values[-1])
+    baseline = float(values[0])
+    delta = current - baseline
+    unit = cfg.get("unit", "")
+    sep = "" if unit in ("", "%") else " "
+    display = f"{current:g}{sep}{unit}"
+    target = cfg.get("target")
+    higher_better = cfg.get("higher_better", True)
+    good = (current >= target) if higher_better else (current <= target)
+    delta_good = (delta > 0) if higher_better else (delta < 0)
+    delta_color = ui.GREEN if delta_good else ui.RED
+    delta_arrow = "↑" if delta > 0 else ("↓" if delta < 0 else "→")
+    delta_text = f"{delta_arrow} {abs(delta):g} {unit} vs baseline"
+    value_color = ui.GREEN if good else ui.INK
+
+    st.markdown(
+        f"""
+        <div class="panel" style="margin-bottom:0.6rem; padding:0.7rem 1rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:0.75rem; flex-wrap:wrap;">
+                <div>
+                    <div style="font-weight:600; font-size:0.92rem; color:{ui.INK};">{cfg['label']} <span class="faint small">· Target {('≥' if higher_better else '≤')} {target:g}{sep}{unit}</span></div>
+                </div>
+                <div style="text-align:right;">
+                    <span style="font-weight:700; font-size:1.15rem; color:{value_color};">{display}</span>
+                    <span style="font-size:0.76rem; color:{delta_color}; font-weight:600; margin-left:0.4rem;">{delta_text}</span>
+                </div>
+            </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    fig = px.line(
+        df, x="label", y=metric_key, markers=False,
+        color_discrete_sequence=[ui.ACCENT],
+    )
+    if target is not None:
+        fig.add_hline(y=target, line_dash="dash", line_color="#B9BEC4", line_width=1)
+    fig.update_layout(
+        height=110, margin=dict(l=8, r=8, t=10, b=8),
+        font=dict(family="Inter, sans-serif", size=10),
+        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+        showlegend=False, yaxis_title="", xaxis_title="", yaxis_visible=False,
+    )
+    fig.update_traces(line_width=2, fill="tozeroy", fillcolor="rgba(217,79,43,0.06)")
+    st.plotly_chart(fig, width="stretch")
+    st.markdown("</div>", unsafe_allow_html=True)
 
 
 def bar_chart(df: pd.DataFrame, x: str, y: str, title: str, color_col: str | None = None, colors: list[str] | None = None) -> None:
