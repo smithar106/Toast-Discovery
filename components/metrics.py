@@ -94,6 +94,7 @@ def bar_chart(df: pd.DataFrame, x: str, y: str, title: str, color_col: str | Non
         font=dict(family="Inter, sans-serif", size=12),
         paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
         title_font=dict(size=14, color=ui.INK),
+        xaxis_title="", yaxis_title="",
     )
     fig.update_traces(texttemplate="%{text}", textposition="outside")
     st.plotly_chart(fig, width="stretch")

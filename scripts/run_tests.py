@@ -101,7 +101,7 @@ def test_control_center():
     assert len(at.selectbox) == 6, "vertical, rep, region, size, week, governance filters"
     # week filter present + reacts
     weekbox = [s for s in at.selectbox if s.label == "Week"][0]
-    weekbox.set_value("Wk of Aug 02").run()
+    weekbox.set_value("08/02/2026").run()
     assert not at.exception
     caps = [c.value for c in at.caption]
     assert caps and any("discoveries" in c for c in caps), "week filter updates record count"
