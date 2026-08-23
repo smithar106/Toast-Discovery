@@ -1,0 +1,9 @@
+{
+  "vertical_meta": {
+    "convenience_fuel": { "name": "Convenience + Fuel", "short": "Conv + Fuel" },
+    "grocery": { "name": "Independent Grocery", "short": "Grocery" },
+    "meat_seafood": { "name": "Meat & Seafood", "short": "Meat & Seafood" },
+    "specialty_food": { "name": "Specialty Food", "short": "Specialty Food" },
+    "general_retail": { "name": "General Retail", "short": "General Retail" }
+  }
+}

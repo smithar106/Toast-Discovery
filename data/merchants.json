@@ -1,0 +1,777 @@
+{
+  "merchants": [
+    {
+      "id": "route9",
+      "name": "Route 9 Fuel & Grab",
+      "vertical": "convenience_fuel",
+      "locations": 3,
+      "region": "Northeast",
+      "rep_id": "maya_chen",
+      "stage": "Discovery",
+      "opportunity_value": 48000,
+      "meeting_date": "2026-08-24",
+      "meeting_time": "10:00 AM",
+      "meeting_type": "In-person",
+      "primary_contact": {
+        "name": "Dana Whitfield",
+        "role": "Owner / Operator",
+        "phone": "(413) 555-0148",
+        "email": "dana@route9fuel.example"
+      },
+      "decision_maker": {
+        "name": "Dana Whitfield",
+        "role": "Owner / Operator",
+        "confirmed": true
+      },
+      "notes": "Three locations along Route 9 corridor. Fuel is the anchor; store sales are secondary but growing. Considering switching from legacy Verifone install. Recent fuel price signage dispute with the county - sensitive to compliance.",
+      "known": {
+        "pos_payment_discussed": {
+          "value": "Yes",
+          "source": "crm",
+          "label": "POS / payment needs discussed"
+        },
+        "considering_toast": {
+          "value": "Yes",
+          "source": "crm",
+          "label": "Actively considering Toast"
+        },
+        "decision_maker": {
+          "value": "Dana Whitfield (Owner)",
+          "source": "crm",
+          "label": "Decision maker"
+        },
+        "locations": {
+          "value": "3 locations",
+          "source": "crm",
+          "label": "Location count"
+        },
+        "existing_pos": {
+          "value": "Legacy Verifine / local install",
+          "source": "rep",
+          "label": "Existing POS"
+        }
+      },
+      "answers": {
+        "sells_age_restricted": {
+          "value": "Yes",
+          "source": "crm",
+          "confirmed": true
+        },
+        "lottery_sales": {
+          "value": "Yes",
+          "source": "rep",
+          "confirmed": true
+        },
+        "lottery_workflow": {
+          "value": "Dedicated lottery terminal, nightly reconciliation",
+          "source": "rep",
+          "confirmed": true
+        },
+        "fuel_integration": {
+          "value": "Yes",
+          "source": "crm",
+          "confirmed": true
+        },
+        "fuel_forecourt_system": {
+          "value": "Wayne Nucleus controller",
+          "source": "rep",
+          "confirmed": true
+        },
+        "fuel_payment_types": {
+          "value": [
+            "Pay-at-pump card",
+            "Fleet cards"
+          ],
+          "source": "rep",
+          "confirmed": true
+        },
+        "existing_pos_vendor": {
+          "value": "Legacy Verifone install",
+          "source": "rep",
+          "confirmed": true
+        },
+        "decision_maker": {
+          "value": "Yes",
+          "source": "crm",
+          "confirmed": true
+        },
+        "locations_confirmed": {
+          "value": "Yes",
+          "source": "crm",
+          "confirmed": true
+        },
+        "locations_count": {
+          "value": 3,
+          "source": "crm",
+          "confirmed": true
+        },
+        "timeline": {
+          "value": "This quarter",
+          "source": "rep",
+          "confirmed": true
+        },
+        "budget_owner": {
+          "value": "Yes",
+          "source": "crm",
+          "confirmed": true
+        }
+      },
+      "discovery": {
+        "in_progress": true,
+        "completed": false
+      }
+    },
+    {
+      "id": "riverbend",
+      "name": "Riverbend Grocery",
+      "vertical": "grocery",
+      "locations": 1,
+      "region": "Southeast",
+      "rep_id": "jordan_ellis",
+      "stage": "Discovery",
+      "opportunity_value": 62000,
+      "meeting_date": "2026-08-24",
+      "meeting_time": "1:30 PM",
+      "meeting_type": "Phone",
+      "primary_contact": {
+        "name": "Marcus Boyd",
+        "role": "Store Manager",
+        "phone": "(843) 555-0121",
+        "email": "marcus@riverbendgrocery.example"
+      },
+      "decision_maker": {
+        "name": "Elena Boyd",
+        "role": "Co-owner",
+        "confirmed": false
+      },
+      "notes": "Family-run independent grocer. High produce volume. Currently running two separate systems for deli and front-end. Interested in consolidating.",
+      "known": {
+        "decision_maker": {
+          "value": "Elena Boyd (Co-owner)",
+          "source": "crm",
+          "label": "Decision maker"
+        },
+        "locations": {
+          "value": "1 location",
+          "source": "crm",
+          "label": "Location count"
+        },
+        "consolidating": {
+          "value": "Yes",
+          "source": "crm",
+          "label": "Interested in consolidation"
+        }
+      },
+      "answers": {
+        "ebt_snap": {
+          "value": "Yes",
+          "source": "crm",
+          "confirmed": true
+        },
+        "ebt_implementation": {
+          "value": "Integrated EBT (SNAP + cash)",
+          "source": "rep",
+          "confirmed": true
+        },
+        "scale_label": {
+          "value": "Yes",
+          "source": "rep",
+          "confirmed": true
+        },
+        "scale_vendor": {
+          "value": "Mettler Toledo",
+          "source": "rep",
+          "confirmed": true
+        },
+        "locations_confirmed": {
+          "value": "Yes",
+          "source": "crm",
+          "confirmed": true
+        },
+        "locations_count": {
+          "value": 1,
+          "source": "crm",
+          "confirmed": true
+        },
+        "timeline": {
+          "value": "This quarter",
+          "source": "crm",
+          "confirmed": true
+        }
+      },
+      "discovery": {
+        "in_progress": true,
+        "completed": false
+      }
+    },
+    {
+      "id": "golden_harvest",
+      "name": "Golden Harvest Grocery",
+      "vertical": "grocery",
+      "locations": 6,
+      "region": "Midwest",
+      "rep_id": "priya_raman",
+      "stage": "Discovery",
+      "opportunity_value": 210000,
+      "meeting_date": "2026-08-25",
+      "meeting_time": "9:00 AM",
+      "meeting_type": "Video",
+      "primary_contact": {
+        "name": "Sandra Osei",
+        "role": "Director of Operations",
+        "phone": "(312) 555-0177",
+        "email": "sandra@goldenharvest.example"
+      },
+      "decision_maker": {
+        "name": "Sandra Osei",
+        "role": "Director of Operations",
+        "confirmed": true
+      },
+      "notes": "Six stores across three metros. Centralized buying, decentralized store ops. Strong candidate for a multi-location rollout.",
+      "known": {
+        "decision_maker": {
+          "value": "Sandra Osei (Dir. Ops)",
+          "source": "crm",
+          "label": "Decision maker"
+        },
+        "locations": {
+          "value": "6 locations",
+          "source": "crm",
+          "label": "Location count"
+        },
+        "centralized_buying": {
+          "value": "Yes",
+          "source": "crm",
+          "label": "Centralized buying"
+        }
+      },
+      "answers": {
+        "ebt_snap": {
+          "value": "Yes",
+          "source": "crm",
+          "confirmed": true
+        },
+        "ebt_implementation": {
+          "value": "Integrated EBT (SNAP + cash)",
+          "source": "rep",
+          "confirmed": true
+        },
+        "scale_label": {
+          "value": "Yes",
+          "source": "rep",
+          "confirmed": true
+        },
+        "scale_vendor": {
+          "value": "NBI SmartTouch",
+          "source": "rep",
+          "confirmed": true
+        },
+        "online_ordering": {
+          "value": "Yes",
+          "source": "crm",
+          "confirmed": true
+        },
+        "online_ordering_platform": {
+          "value": "Mercato",
+          "source": "rep",
+          "confirmed": true
+        },
+        "locations_confirmed": {
+          "value": "Yes",
+          "source": "crm",
+          "confirmed": true
+        },
+        "locations_count": {
+          "value": 6,
+          "source": "crm",
+          "confirmed": true
+        },
+        "store_config_differences": {
+          "value": "No",
+          "source": "rep",
+          "confirmed": true
+        },
+        "decision_maker": {
+          "value": "Yes",
+          "source": "crm",
+          "confirmed": true
+        },
+        "timeline": {
+          "value": "Next quarter",
+          "source": "crm",
+          "confirmed": true
+        }
+      },
+      "discovery": {
+        "in_progress": false,
+        "completed": true
+      }
+    },
+    {
+      "id": "cornermart",
+      "name": "CornerMart",
+      "vertical": "convenience_fuel",
+      "locations": 2,
+      "region": "West",
+      "rep_id": "sofia_reyes",
+      "stage": "Discovery",
+      "opportunity_value": 39000,
+      "meeting_date": "2026-08-25",
+      "meeting_time": "2:00 PM",
+      "meeting_type": "In-person",
+      "primary_contact": {
+        "name": "Hector Ruiz",
+        "role": "Franchise Owner",
+        "phone": "(602) 555-0199",
+        "email": "hector@cornermart.example"
+      },
+      "decision_maker": {
+        "name": "Hector Ruiz",
+        "role": "Franchise Owner",
+        "confirmed": true
+      },
+      "notes": "Two franchise locations in a metro market. Heavy lottery volume. Fuel via a small independent station on one site.",
+      "known": {
+        "decision_maker": {
+          "value": "Hector Ruiz (Owner)",
+          "source": "crm",
+          "label": "Decision maker"
+        },
+        "locations": {
+          "value": "2 locations",
+          "source": "crm",
+          "label": "Location count"
+        }
+      },
+      "answers": {
+        "sells_age_restricted": {
+          "value": "Yes",
+          "source": "rep",
+          "confirmed": true
+        },
+        "age_products": {
+          "value": [
+            "Tobacco",
+            "Vaping / nicotine"
+          ],
+          "source": "rep",
+          "confirmed": true
+        },
+        "lottery_sales": {
+          "value": "Yes",
+          "source": "rep",
+          "confirmed": true
+        },
+        "lottery_workflow": {
+          "value": "Dedicated lottery terminal, nightly reconciliation",
+          "source": "rep",
+          "confirmed": true
+        },
+        "fuel_integration": {
+          "value": "Yes",
+          "source": "rep",
+          "confirmed": true
+        },
+        "fuel_forecourt_system": {
+          "value": "Gilbarco Passport",
+          "source": "rep",
+          "confirmed": true
+        },
+        "decision_maker": {
+          "value": "Yes",
+          "source": "crm",
+          "confirmed": true
+        },
+        "locations_confirmed": {
+          "value": "Yes",
+          "source": "crm",
+          "confirmed": true
+        },
+        "locations_count": {
+          "value": 2,
+          "source": "crm",
+          "confirmed": true
+        },
+        "timeline": {
+          "value": "ASAP (within 30 days)",
+          "source": "rep",
+          "confirmed": true
+        }
+      },
+      "discovery": {
+        "in_progress": true,
+        "completed": false
+      }
+    },
+    {
+      "id": "alpine",
+      "name": "Alpine Meat & Seafood Co.",
+      "vertical": "meat_seafood",
+      "locations": 2,
+      "region": "Southeast",
+      "rep_id": "jordan_ellis",
+      "stage": "Discovery",
+      "opportunity_value": 88000,
+      "meeting_date": "2026-08-26",
+      "meeting_time": "11:00 AM",
+      "meeting_type": "Video",
+      "primary_contact": {
+        "name": "Paul Niedermeyer",
+        "role": "Co-owner / Butcher",
+        "phone": "(828) 555-0133",
+        "email": "paul@alpinemeat.example"
+      },
+      "decision_maker": {
+        "name": "Paul Niedermeyer",
+        "role": "Co-owner / Butcher",
+        "confirmed": true
+      },
+      "notes": "Premium butcher + seafood counter. Two locations, high-service model with custom cut program. Scale and label workflows are core.",
+      "known": {
+        "decision_maker": {
+          "value": "Paul Niedermeyer (Co-owner)",
+          "source": "crm",
+          "label": "Decision maker"
+        },
+        "locations": {
+          "value": "2 locations",
+          "source": "crm",
+          "label": "Location count"
+        },
+        "custom_cut_program": {
+          "value": "Yes",
+          "source": "crm",
+          "label": "Custom cut program"
+        }
+      },
+      "answers": {
+        "scale_pricing": {
+          "value": "Yes",
+          "source": "crm",
+          "confirmed": true
+        },
+        "label_printing": {
+          "value": "Yes",
+          "source": "rep",
+          "confirmed": true
+        },
+        "label_printer_model": {
+          "value": "Sato CL4NX",
+          "source": "rep",
+          "confirmed": true
+        },
+        "cold_storage": {
+          "value": "Yes",
+          "source": "rep",
+          "confirmed": true
+        },
+        "specialized_hardware": {
+          "value": "Yes",
+          "source": "rep",
+          "confirmed": true
+        },
+        "hardware_specs": {
+          "value": [
+            "Deli scales",
+            "Label printers"
+          ],
+          "source": "rep",
+          "confirmed": true
+        },
+        "decision_maker": {
+          "value": "Yes",
+          "source": "crm",
+          "confirmed": true
+        },
+        "locations_confirmed": {
+          "value": "Yes",
+          "source": "crm",
+          "confirmed": true
+        },
+        "locations_count": {
+          "value": 2,
+          "source": "crm",
+          "confirmed": true
+        },
+        "custom_orders": {
+          "value": "Yes",
+          "source": "rep",
+          "confirmed": true
+        },
+        "timeline": {
+          "value": "Next quarter",
+          "source": "crm",
+          "confirmed": true
+        }
+      },
+      "discovery": {
+        "in_progress": true,
+        "completed": false
+      }
+    },
+    {
+      "id": "fern_field",
+      "name": "Fern & Field Provisions",
+      "vertical": "specialty_food",
+      "locations": 2,
+      "region": "Northeast",
+      "rep_id": "maya_chen",
+      "stage": "Discovery",
+      "opportunity_value": 54000,
+      "meeting_date": "2026-08-26",
+      "meeting_time": "3:30 PM",
+      "meeting_type": "Phone",
+      "primary_contact": {
+        "name": "Ruth Ellison",
+        "role": "Founder",
+        "phone": "(802) 555-0162",
+        "email": "ruth@fernfield.example"
+      },
+      "decision_maker": {
+        "name": "Ruth Ellison",
+        "role": "Founder",
+        "confirmed": true
+      },
+      "notes": "Artisan food market with strong gift basket and online business. Expanding to a second location this fall.",
+      "known": {
+        "decision_maker": {
+          "value": "Ruth Ellison (Founder)",
+          "source": "crm",
+          "label": "Decision maker"
+        },
+        "locations": {
+          "value": "2 locations",
+          "source": "crm",
+          "label": "Location count"
+        },
+        "online_business": {
+          "value": "Yes",
+          "source": "crm",
+          "label": "Online business"
+        }
+      },
+      "answers": {
+        "inventory_management": {
+          "value": "Yes",
+          "source": "rep",
+          "confirmed": true
+        },
+        "inventory_system": {
+          "value": "QuickBooks",
+          "source": "rep",
+          "confirmed": true
+        },
+        "gift_cards": {
+          "value": "Yes",
+          "source": "crm",
+          "confirmed": true
+        },
+        "online_sales": {
+          "value": "Yes",
+          "source": "crm",
+          "confirmed": true
+        },
+        "online_sales_platform": {
+          "value": "Shopify",
+          "source": "crm",
+          "confirmed": true
+        },
+        "decision_maker": {
+          "value": "Yes",
+          "source": "crm",
+          "confirmed": true
+        },
+        "locations_confirmed": {
+          "value": "Yes",
+          "source": "crm",
+          "confirmed": true
+        },
+        "locations_count": {
+          "value": 2,
+          "source": "crm",
+          "confirmed": true
+        },
+        "store_config_differences": {
+          "value": "Yes",
+          "source": "rep",
+          "confirmed": true
+        },
+        "timeline": {
+          "value": "This quarter",
+          "source": "crm",
+          "confirmed": true
+        }
+      },
+      "discovery": {
+        "in_progress": true,
+        "completed": false
+      }
+    },
+    {
+      "id": "northline",
+      "name": "Northline Home Goods",
+      "vertical": "general_retail",
+      "locations": 4,
+      "region": "Southwest",
+      "rep_id": "dev_patel",
+      "stage": "Discovery",
+      "opportunity_value": 96000,
+      "meeting_date": "2026-08-27",
+      "meeting_time": "10:30 AM",
+      "meeting_type": "In-person",
+      "primary_contact": {
+        "name": "Amara Toussaint",
+        "role": "General Manager",
+        "phone": "(214) 555-0184",
+        "email": "amara@northlinehome.example"
+      },
+      "decision_maker": {
+        "name": "Greg Hannon",
+        "role": "CEO",
+        "confirmed": false
+      },
+      "notes": "Four-location home goods retailer. High SKU count with serialized furniture tracking. Multi-location rollout expected.",
+      "known": {
+        "locations": {
+          "value": "4 locations",
+          "source": "crm",
+          "label": "Location count"
+        },
+        "serialized_tracking": {
+          "value": "Yes",
+          "source": "crm",
+          "label": "Serialized furniture tracking"
+        },
+        "decision_maker": {
+          "value": "Greg Hannon (CEO) - unconfirmed",
+          "source": "crm",
+          "label": "Decision maker"
+        }
+      },
+      "answers": {
+        "sku_volume": {
+          "value": 4500,
+          "source": "rep",
+          "confirmed": true
+        },
+        "serial_tracking": {
+          "value": "Yes",
+          "source": "crm",
+          "confirmed": true
+        },
+        "returns_workflow": {
+          "value": "Yes",
+          "source": "rep",
+          "confirmed": true
+        },
+        "locations_confirmed": {
+          "value": "Yes",
+          "source": "crm",
+          "confirmed": true
+        },
+        "locations_count": {
+          "value": 4,
+          "source": "crm",
+          "confirmed": true
+        },
+        "store_config_differences": {
+          "value": "Yes",
+          "source": "rep",
+          "confirmed": true
+        },
+        "timeline": {
+          "value": "Flexible / exploratory",
+          "source": "crm",
+          "confirmed": true
+        }
+      },
+      "discovery": {
+        "in_progress": true,
+        "completed": false
+      }
+    },
+    {
+      "id": "spruce_bowl",
+      "name": "Spruce Bowl Kitchen",
+      "vertical": "general_retail",
+      "locations": 1,
+      "region": "West",
+      "rep_id": "sofia_reyes",
+      "stage": "Discovery",
+      "opportunity_value": 31000,
+      "meeting_date": "2026-08-28",
+      "meeting_time": "9:30 AM",
+      "meeting_type": "Video",
+      "primary_contact": {
+        "name": "Kenji Morita",
+        "role": "Owner",
+        "phone": "(503) 555-0156",
+        "email": "kenji@sprucebowl.example"
+      },
+      "decision_maker": {
+        "name": "Kenji Morita",
+        "role": "Owner",
+        "confirmed": true
+      },
+      "notes": "Retail kitchen + pantry goods store. Strong subscription box side business. Single location, opening second next spring.",
+      "known": {
+        "decision_maker": {
+          "value": "Kenji Morita (Owner)",
+          "source": "crm",
+          "label": "Decision maker"
+        },
+        "locations": {
+          "value": "1 location",
+          "source": "crm",
+          "label": "Location count"
+        }
+      },
+      "answers": {
+        "sku_volume": {
+          "value": 1200,
+          "source": "rep",
+          "confirmed": true
+        },
+        "serial_tracking": {
+          "value": "No",
+          "source": "rep",
+          "confirmed": true
+        },
+        "returns_workflow": {
+          "value": "Yes",
+          "source": "rep",
+          "confirmed": true
+        },
+        "loyalty_general": {
+          "value": "Yes",
+          "source": "crm",
+          "confirmed": true
+        },
+        "decision_maker": {
+          "value": "Yes",
+          "source": "crm",
+          "confirmed": true
+        },
+        "locations_confirmed": {
+          "value": "Yes",
+          "source": "crm",
+          "confirmed": true
+        },
+        "locations_count": {
+          "value": 1,
+          "source": "crm",
+          "confirmed": true
+        },
+        "timeline": {
+          "value": "Next quarter",
+          "source": "rep",
+          "confirmed": true
+        }
+      },
+      "discovery": {
+        "in_progress": false,
+        "completed": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "as_of_week": "2026-08-23",
+  "kpi": {
+    "first_pass_complete": { "value": 82, "unit": "%", "prev": 78, "target": 85 },
+    "deals_critical_gaps": { "value": 6, "unit": "", "prev": 9, "target": 4 },
+    "clarification_rate": { "value": 14, "unit": "%", "prev": 18, "target": 10 },
+    "median_time_to_handoff": { "value": 1.8, "unit": "days", "prev": 2.4, "target": 1.5 },
+    "rep_capacity_recovered": { "value": 46, "unit": "hrs/mo", "prev": 32, "target": null },
+    "median_time_to_live": { "value": 18, "unit": "days", "prev": 21, "target": 15 }
+  },
+  "weekly": [
+    { "week": "2026-06-14", "label": "Wk of Jun 14", "first_pass": 64, "clarification": 27, "time_to_handoff": 3.4, "reengagement": 9, "time_to_live": 26 },
+    { "week": "2026-06-21", "label": "Wk of Jun 21", "first_pass": 66, "clarification": 25, "time_to_handoff": 3.2, "reengagement": 8, "time_to_live": 25 },
+    { "week": "2026-06-28", "label": "Wk of Jun 28", "first_pass": 68, "clarification": 24, "time_to_handoff": 3.0, "reengagement": 8, "time_to_live": 24 },
+    { "week": "2026-07-05", "label": "Wk of Jul 05", "first_pass": 70, "clarification": 22, "time_to_handoff": 2.8, "reengagement": 7, "time_to_live": 23 },
+    { "week": "2026-07-12", "label": "Wk of Jul 12", "first_pass": 72, "clarification": 21, "time_to_handoff": 2.7, "reengagement": 7, "time_to_live": 22 },
+    { "week": "2026-07-19", "label": "Wk of Jul 19", "first_pass": 74, "clarification": 20, "time_to_handoff": 2.5, "reengagement": 6, "time_to_live": 21 },
+    { "week": "2026-07-26", "label": "Wk of Jul 26", "first_pass": 75, "clarification": 19, "time_to_handoff": 2.3, "reengagement": 6, "time_to_live": 20 },
+    { "week": "2026-08-02", "label": "Wk of Aug 02", "first_pass": 77, "clarification": 18, "time_to_handoff": 2.2, "reengagement": 5, "time_to_live": 19 },
+    { "week": "2026-08-09", "label": "Wk of Aug 09", "first_pass": 79, "clarification": 16, "time_to_handoff": 2.0, "reengagement": 5, "time_to_live": 19 },
+    { "week": "2026-08-16", "label": "Wk of Aug 16", "first_pass": 81, "clarification": 15, "time_to_handoff": 1.9, "reengagement": 4, "time_to_live": 18 },
+    { "week": "2026-08-23", "label": "This week", "first_pass": 82, "clarification": 14, "time_to_handoff": 1.8, "reengagement": 4, "time_to_live": 18 }
+  ],
+  "missed_requirements": [
+    { "requirement": "Age Verification", "vertical": "convenience_fuel", "miss_rate": 19, "downstream_impact": "High", "trend": "down", "note": "Improved 6 pts after v3.2 playbook; above 10% target" },
+    { "requirement": "Scale / Labeling", "vertical": "grocery", "miss_rate": 14, "downstream_impact": "High", "trend": "flat", "note": "Persistent gap; typically surfaces at hardware staging" },
+    { "requirement": "Decision Maker", "vertical": "all", "miss_rate": 11, "downstream_impact": "Medium", "trend": "down", "note": "Improving with confirmation prompt in playbook" },
+    { "requirement": "EBT Requirements", "vertical": "grocery", "miss_rate": 9, "downstream_impact": "High", "trend": "down", "note": "Linked to EBT approval lead time" },
+    { "requirement": "Fuel / Forecourt Integration", "vertical": "convenience_fuel", "miss_rate": 8, "downstream_impact": "High", "trend": "flat", "note": "High rework cost when discovered late" },
+    { "requirement": "Store-by-store config", "vertical": "all", "miss_rate": 7, "downstream_impact": "Medium", "trend": "up", "note": "Rising with multi-location pipeline growth" },
+    { "requirement": "Hardware Sizing", "vertical": "general_retail", "miss_rate": 6, "downstream_impact": "Medium", "trend": "down", "note": "Controlled by hardware questionnaire" }
+  ],
+  "vertical_performance": [
+    { "vertical": "grocery", "label": "Grocery", "deals": 34, "first_pass": 84, "clarification": 12, "time_to_handoff": 1.9, "time_to_live": 17 },
+    { "vertical": "convenience_fuel", "label": "Convenience + Fuel", "deals": 28, "first_pass": 76, "clarification": 18, "time_to_handoff": 2.3, "time_to_live": 21 },
+    { "vertical": "specialty_food", "label": "Specialty Food", "deals": 19, "first_pass": 88, "clarification": 9, "time_to_handoff": 1.5, "time_to_live": 15 },
+    { "vertical": "meat_seafood", "label": "Meat & Seafood", "deals": 14, "first_pass": 86, "clarification": 10, "time_to_handoff": 1.6, "time_to_live": 16 },
+    { "vertical": "general_retail", "label": "General Retail", "deals": 22, "first_pass": 80, "clarification": 13, "time_to_handoff": 2.0, "time_to_live": 19 }
+  ],
+  "rep_performance": [
+    { "rep_id": "maya_chen", "rep": "Maya Chen", "deals": 17, "first_pass": 88, "critical_gap_rate": 6, "clarification": 9, "time_to_handoff": 1.6 },
+    { "rep_id": "jordan_ellis", "rep": "Jordan Ellis", "deals": 15, "first_pass": 84, "critical_gap_rate": 9, "clarification": 12, "time_to_handoff": 1.8 },
+    { "rep_id": "priya_raman", "rep": "Priya Raman", "deals": 16, "first_pass": 82, "critical_gap_rate": 11, "clarification": 14, "time_to_handoff": 2.0 },
+    { "rep_id": "dev_patel", "rep": "Dev Patel", "deals": 14, "first_pass": 79, "critical_gap_rate": 14, "clarification": 16, "time_to_handoff": 2.2 },
+    { "rep_id": "sofia_reyes", "rep": "Sofia Reyes", "deals": 15, "first_pass": 80, "critical_gap_rate": 13, "clarification": 15, "time_to_handoff": 2.1 },
+    { "rep_id": "tom_okafor", "rep": "Tom Okafor", "deals": 12, "first_pass": 76, "critical_gap_rate": 16, "clarification": 18, "time_to_handoff": 2.4 }
+  ],
+  "insights": [
+    "Age-verification discovery remains the largest preventable source of Convenience + Fuel rework. Miss rate improved 6 points after the updated playbook but remains above the 10% target.",
+    "Grocery EBT gaps cluster around merchants who were confirmed 'actively considering' before the EBT question was standardized. Recommend a pre-meeting checklist nudge for grocery leads.",
+    "Store-by-store configuration gaps are rising with multi-location pipeline growth. The v3.2 'location differences' prompt is the newest control — monitor for 3 more weeks before adjusting the rule."
+  ],
+  "governance_events": [
+    { "date": "2026-08-01", "req_id": "age_verification", "change": "Age-verification requirement promoted to Critical; version bump to v3.2", "owner": "Retail Solutions" },
+    { "date": "2026-07-18", "req_id": "lottery", "change": "Lottery workflow question added to Convenience + Fuel playbook", "owner": "Retail Solutions" },
+    { "date": "2026-07-05", "req_id": "ebt", "change": "EBT implementation approach question expanded (integrated vs terminal)", "owner": "Grocery Vertical" },
+    { "date": "2026-06-25", "req_id": "general", "change": "Added store-by-store configuration question for multi-location merchants", "owner": "Commercial Operations" }
+  ]
+}
