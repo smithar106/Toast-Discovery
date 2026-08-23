@@ -146,7 +146,8 @@
       "miss_rate": 19,
       "downstream_impact": "High",
       "trend": "down",
-      "note": "Improved 6 pts after v3.2 playbook; above 10% target"
+      "note": "Improved 6 pts after v3.2 playbook; above 10% target",
+      "action": "Review the v3.2 playbook requirement and add an age-verification pre-meeting nudge for Convenience + Fuel leads."
     },
     {
       "requirement": "Scale / Labeling",
@@ -154,7 +155,8 @@
       "miss_rate": 14,
       "downstream_impact": "High",
       "trend": "flat",
-      "note": "Persistent gap; typically surfaces at hardware staging"
+      "note": "Persistent gap; typically surfaces at hardware staging",
+      "action": "Escalate scale/label config to grocery onboarding \u2014 it typically surfaces at hardware staging."
     },
     {
       "requirement": "Decision Maker",
@@ -162,7 +164,8 @@
       "miss_rate": 11,
       "downstream_impact": "Medium",
       "trend": "down",
-      "note": "Improving with confirmation prompt in playbook"
+      "note": "Improving with confirmation prompt in playbook",
+      "action": "Keep the confirmation prompt in the playbook; monitor for one more quarter."
     },
     {
       "requirement": "EBT Requirements",
@@ -170,7 +173,8 @@
       "miss_rate": 9,
       "downstream_impact": "High",
       "trend": "down",
-      "note": "Linked to EBT approval lead time"
+      "note": "Linked to EBT approval lead time",
+      "action": "Add EBT approval lead time to the grocery pre-meeting checklist."
     },
     {
       "requirement": "Fuel / Forecourt Integration",
@@ -178,7 +182,8 @@
       "miss_rate": 8,
       "downstream_impact": "High",
       "trend": "flat",
-      "note": "High rework cost when discovered late"
+      "note": "High rework cost when discovered late",
+      "action": "Require forecourt system name at first meeting for all fuel merchants."
     },
     {
       "requirement": "Store-by-store config",
@@ -186,7 +191,8 @@
       "miss_rate": 7,
       "downstream_impact": "Medium",
       "trend": "up",
-      "note": "Rising with multi-location pipeline growth"
+      "note": "Rising with multi-location pipeline growth",
+      "action": "Monitor the new location-differences prompt for 3 more weeks before adjusting the rule."
     },
     {
       "requirement": "Hardware Sizing",
@@ -194,7 +200,8 @@
       "miss_rate": 6,
       "downstream_impact": "Medium",
       "trend": "down",
-      "note": "Controlled by hardware questionnaire"
+      "note": "Controlled by hardware questionnaire",
+      "action": "No action required \u2014 trend is improving with the hardware questionnaire."
     }
   ],
   "vertical_performance": [

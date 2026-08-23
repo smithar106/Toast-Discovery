@@ -25,13 +25,14 @@ Two ideas govern the architecture:
 
 | Capability | Where |
 | --- | --- |
-| Weekly merchant meeting list with completeness signals | Sales Rep → This Week |
+| Weekly merchant meeting agenda with critical-item counts | Sales Rep → This Week |
 | Vertical-specific discovery playbooks (5 verticals) | Sales Rep → merchant playbook |
 | Conditional questions that react to earlier answers | Any playbook |
 | CRM-known info prepopulated, never re-entered | Playbook header |
 | "Before you leave" critical-gap blocking | Submission gate |
+| Critical-remaining as the primary rep metric (not %) | Playbook header + agenda |
 | Recording upload + simulated AI fact extraction (labeled, needs confirmation) | Additional context |
-| Deterministic completeness %, blocked/enabled submission | Submission gate |
+| Deterministic completeness validation, blocked/enabled submission | Submission gate |
 | Onboarding handoff with per-field provenance | Post-submit artifact |
 | Executive KPIs, week-over-week trends, segmentation filters | Control Center |
 | Reactive KPIs — KPI row recomputes when you segment | Control Center |
@@ -175,20 +176,20 @@ streamlit run app.py --server.address=0.0.0.0 --server.port=$PORT --server.headl
 
 ## Demo walkthrough (5–7 minutes)
 
-1. **Sales Rep view** — see "This Week": five merchants with statuses and completeness.
-2. **Open Route 9 Fuel & Grab.**
+1. **Sales Rep view** — see the "Discovery agenda": merchant rows with time, vertical, status, and **critical items to confirm**.
+2. **Open Route 9 Fuel & Grab.** The header reads "3 critical requirements remaining" — not a percentage.
 3. Review **Already Known (from CRM)** chips — decision maker, locations, fuel context.
-4. See prioritized **🔴 Critical requirements**; **Age verification is visually unresolved**.
+4. The **🔴 Before you leave** panel shows exactly which critical items remain; **Age verification is impossible to miss**.
 5. Answer the age-restricted question → **conditional questions appear** (product categories, today's method, POS enforcement).
 6. Add a **merchant note** and optionally **upload a recording** (simulated AI extraction, labeled, needs confirmation).
-7. Watch **Discovery completeness** climb; **Before you leave** clears.
-8. **Submit Discovery** → Salesforce update, structured record saved, handoff generated, consultant notified.
+7. The **Before you leave** panel clears and flips to **✓ Ready for handoff**.
+8. **Submit discovery** → Salesforce update, structured record saved, handoff generated, consultant notified.
 9. The **onboarding handoff** shows the confirmed age-verification requirement with provenance (CRM / Rep / AI).
-10. Switch to **RevOps Director → Control Center**.
-11. Read the **executive KPI row** and week-over-week trend charts.
+10. Switch to **RevOps → Control Center**.
+11. Read the **primary metric row** and the **Attention this week** panel (age verification, miss rate, recommended action).
 12. **Filter to Convenience + Fuel** — charts, tables, and the KPI row react.
-13. **Critical gap analysis** shows age verification as the most commonly missed requirement.
-14. Open **Governed Discovery Requirements** — see owners, versions, and rules; explain how leadership closes the loop.
+13. **Where requirements fail** shows age verification as the most commonly missed requirement.
+14. Open **Governed requirements** — see owners, versions, and rules; explain how leadership closes the loop.
 
 ---
 

@@ -57,14 +57,17 @@ def contextualize_merchant(merchant: dict, answers: dict, critical_missing: list
 
 
 def _fallback_context(merchant, answers, critical_missing, vname, known, locs, notes) -> str:
-    lines = [f"For this {vname.lower()} merchant with {locs} location(s), focus discovery on the operations that drive the biggest rework risk."]
+    lines = []
     if critical_missing:
         labels = [r["label"] for r in critical_missing]
-        lines.append(f"The highest priority is confirming: {' and '.join(labels)} — these shape configuration and can't be added cleanly after sign-off.")
+        if len(labels) == 1:
+            lines.append(f"Confirm {labels[0].lower()} before you leave — it shapes configuration and can't be added cleanly after sign-off.")
+        else:
+            lines.append(f"Confirm {' and '.join(l.lower() for l in labels)} before you leave — they shape configuration and drive rework if missed.")
     else:
-        lines.append("All critical requirements are covered; use remaining time to capture important context and confirm timeline.")
+        lines.append("All critical requirements are confirmed. Use remaining time on important context and the target timeline.")
     if locs and int(locs) > 1:
-        lines.append("Because this is a multi-location rollout, confirm whether configuration should be centralized or store-by-store.")
+        lines.append("Multi-location rollout — confirm whether configuration should be centralized or store-by-store.")
     return " ".join(lines)
 
 

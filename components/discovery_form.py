@@ -1,14 +1,16 @@
 """Interactive discovery form with conditional requirements.
 
-Answers are stored per-merchant in st.session_state and keyed by requirement id.
-Rendering order follows the requirements library; conditions are re-evaluated
-on every rerun so child questions appear as soon as their parent is answered.
+Compact single-panel design: requirements render as tight rows (label left,
+widget right) inside one Critical panel and one quieter Important panel. The
+panel header carries the "before you leave" count so the rep sees the minimum
+sufficient discovery state at a glance.
 """
 from __future__ import annotations
 
 import streamlit as st
 
 from components import ui
+from services import load_requirements
 from services.discovery_engine import grouped_requirements
 
 
@@ -21,60 +23,57 @@ def _widget_key(merchant_id: str, req_id: str) -> str:
     return f"ans_{merchant_id}_{req_id}"
 
 
-def _render_widget(merchant_id: str, req: dict, entry: dict | None, default_value=None):
-    """Render the correct widget; returns (value, changed)."""
+def _label(req_id: str) -> str:
+    for r in load_requirements():
+        if r["id"] == req_id:
+            return r["label"]
+    return req_id
+
+
+def _render_widget(merchant_id: str, req: dict, entry: dict | None, existing_value):
+    """Render the correct compact widget; returns (value, changed)."""
     req_id = req["id"]
     key = _widget_key(merchant_id, req_id)
     itype = req.get("input_type")
-    existing_value = default_value if default_value is not None else (entry.get("value") if entry else None)
+    if existing_value is None and entry is not None:
+        existing_value = entry.get("value")
     current = existing_value
 
     if itype == "yesno":
-        options = ["Yes", "No", "Unknown"]
         value = st.segmented_control(
-            req["question"], options=options, default=existing_value,
+            "answer", options=["Yes", "No", "Unknown"], default=existing_value,
             key=key, help=req.get("help"), label_visibility="collapsed",
+            format_func=lambda x: x if x else "—",
         )
-        current = existing_value
     elif itype == "radio":
         options = req["options"]
-        idx = None
-        if existing_value in options:
-            idx = options.index(existing_value)
-        value = st.radio(req["question"], options, index=idx,
-                         key=key, help=req.get("help"), horizontal=True)
-        current = existing_value
+        idx = options.index(existing_value) if existing_value in options else None
+        value = st.radio("answer", options, index=idx, key=key, help=req.get("help"),
+                         label_visibility="collapsed", horizontal=True)
     elif itype == "dropdown":
         options = ["— Select —"] + req["options"]
-        idx = 0
-        if existing_value in options:
-            idx = options.index(existing_value)
-        value = st.selectbox(req["question"], options, index=idx, key=key,
-                             help=req.get("help"), label_visibility="collapsed")
-        current = existing_value
+        idx = options.index(existing_value) if existing_value in options else 0
+        value = st.selectbox("answer", options, index=idx, key=key, help=req.get("help"),
+                             label_visibility="collapsed")
     elif itype == "multiselect":
-        value = st.multiselect(req["question"], req["options"],
+        value = st.multiselect("answer", req["options"],
                                default=list(existing_value) if isinstance(existing_value, list) else [],
-                               key=key, help=req.get("help"), label_visibility="collapsed")
-        current = existing_value
+                               key=key, help=req.get("help"), label_visibility="collapsed",
+                               max_selections=4, placeholder="Select…")
     elif itype == "number":
-        value = st.number_input(req["question"], min_value=0, step=1,
+        value = st.number_input("answer", min_value=0, step=1,
                                 value=None if existing_value is None else int(existing_value),
                                 key=key, help=req.get("help"), label_visibility="collapsed")
-        current = existing_value
     elif itype == "text":
-        value = st.text_input(req["question"], value=str(existing_value) if existing_value else "",
+        value = st.text_input("answer", value=str(existing_value) if existing_value else "",
                               key=key, help=req.get("help"),
                               placeholder=req.get("placeholder", ""), label_visibility="collapsed")
-        current = existing_value
     elif itype == "textarea":
-        value = st.text_area(req["question"], value=str(existing_value) if existing_value else "",
+        value = st.text_area("answer", value=str(existing_value) if existing_value else "",
                              key=key, help=req.get("help"), label_visibility="collapsed")
-        current = existing_value
     else:
-        value = st.text_input(req["question"], value=str(existing_value) if existing_value else "",
+        value = st.text_input("answer", value=str(existing_value) if existing_value else "",
                               key=key, label_visibility="collapsed")
-        current = existing_value
 
     changed = False
     if itype == "yesno":
@@ -111,88 +110,89 @@ def _finalize(answers: dict, req_id: str, value, entry: dict | None, changed: bo
     answers[req_id] = {"value": value, "source": new_source, "confirmed": confirmed}
 
 
-def render_discovery_form(merchant: dict, answers: dict) -> dict:
-    """Render critical + important sections; returns updated answers dict."""
+def render_discovery_form(merchant: dict, answers: dict, evaluation: dict) -> dict:
+    """Render compact Critical + Important panels; returns updated answers."""
     vertical = merchant["vertical"]
     merchant_id = merchant["id"]
     critical, important, _ = grouped_requirements(vertical, answers)
 
-    st.markdown('<div class="section-title" style="font-size:1.05rem;">🔴 Critical requirements</div>',
-                unsafe_allow_html=True)
+    n_missing = len(evaluation["critical_missing"])
+    missing_labels = " · ".join(f'<span style="color:{ui.INK};">{r["label"]}</span>' for r in evaluation["critical_missing"])
+    if n_missing:
+        header_label = f"🔴 Before you leave · {n_missing} remaining"
+        header_sub = f'<span style="font-weight:500; color:{ui.RED}; text-transform:none; letter-spacing:0; font-size:0.8rem;">{missing_labels}</span>'
+    else:
+        header_label = "🔴 Critical requirements · complete"
+        header_sub = '<span class="chip chip-green">✓ Ready for handoff</span>'
+
     st.markdown(
-        '<div class="muted small" style="margin-bottom:0.6rem;">Information that can determine '
-        'viability, implementation design, or cause downstream rework if missed.</div>',
-        unsafe_allow_html=True)
+        f'<div class="panel-flush" style="margin-bottom:1rem;">'
+        f'<div class="critical-header"><span class="critical-title">{header_label}</span>{header_sub}</div>',
+        unsafe_allow_html=True,
+    )
 
     for req in critical:
         entry = _existing(answers, req["id"])
-        parent = req.get("condition", {}).get("field")
-        child_of = f'<span class="muted small" style="margin-left:6px;">after “{_label(parent)}”</span>' if parent else ""
-        source = ""
+        source_chips = ""
         if entry:
             src = entry.get("source")
-            src_cls = "badge badge-blue" if src == "crm" else ("badge badge-accent" if src == "ai" else "badge badge-green")
-            src_lbl = {"crm": "Known · CRM", "ai": "AI extracted", "rep": "Rep confirmed"}[src]
-            source = f'<span class="{src_cls}" style="margin-left:6px;">{src_lbl}</span>'
-            if src == "ai" and not entry.get("confirmed"):
-                source += '<span class="badge badge-amber" style="margin-left:4px;">needs confirmation</span>'
-
-        st.markdown(
-            f"""
-            <div class="req-card">
-                <div style="display:flex; justify-content:space-between; align-items:center; gap:0.5rem;">
-                    <div>
-                        <span class="req-question">{req['question']}</span>{child_of}
-                    </div>
-                    <div style="display:flex; gap:4px; flex-shrink:0;">{source}</div>
-                </div>
-                <div style="margin-top:0.5rem;">
-            """,
-            unsafe_allow_html=True,
-        )
-        value, changed = _render_widget(merchant_id, req, entry, None)
-        _finalize(answers, req["id"], value, entry, changed)
-        st.markdown("</div></div>", unsafe_allow_html=True)
-
-    st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
-    st.markdown('<div class="section-title" style="font-size:1.05rem;">🟡 Important / conditional</div>',
-                unsafe_allow_html=True)
-    st.markdown(
-        '<div class="muted small" style="margin-bottom:0.6rem;">Matters depending on merchant context. '
-        'Not required to mark discovery complete.</div>',
-        unsafe_allow_html=True)
-
-    for req in important:
-        entry = _existing(answers, req["id"])
+            if src == "crm":
+                source_chips = ui.chip("CRM known", "blue")
+            elif src == "ai":
+                source_chips = ui.chip("AI extracted" if not entry.get("confirmed") else "AI confirmed", "accent")
+            else:
+                source_chips = ui.chip("Confirmed", "green")
         parent = req.get("condition", {}).get("field")
-        child_of = f'<span class="muted small" style="margin-left:6px;">after “{_label(parent)}”</span>' if parent else ""
-        source = ""
-        if entry:
-            src = entry.get("source")
-            src_cls = "badge badge-blue" if src == "crm" else ("badge badge-accent" if src == "ai" else "badge badge-green")
-            src_lbl = {"crm": "Known · CRM", "ai": "AI extracted", "rep": "Rep confirmed"}[src]
-            source = f'<span class="{src_cls}" style="margin-left:6px;">{src_lbl}</span>'
+        child = f'<span class="q-help">after “{_label(parent)}”</span>' if parent else ""
+
+        c1, c2 = st.columns([3.2, 2.4], gap="small")
+        with c1:
+            st.markdown(
+                f'<div style="padding:0.45rem 0.25rem 0.45rem 1rem;"><span class="q-label">{req["question"]}</span>'
+                f'<div style="display:flex; gap:0.3rem; margin-top:0.15rem;">{child}{source_chips}</div></div>',
+                unsafe_allow_html=True,
+            )
+        with c2:
+            value, changed = _render_widget(merchant_id, req, entry, None)
+            _finalize(answers, req["id"], value, entry, changed)
+        if req is not critical[-1]:
+            st.markdown('<div style="border-top:1px solid #EFF0F1; margin:0 1rem;"></div>', unsafe_allow_html=True)
+
+    st.markdown("</div>", unsafe_allow_html=True)
+
+    if important:
         st.markdown(
-            f"""
-            <div class="req-card">
-                <div style="display:flex; justify-content:space-between; align-items:center; gap:0.5rem;">
-                    <div><span class="req-question">{req['question']}</span>{child_of}</div>
-                    <div style="display:flex; gap:4px; flex-shrink:0;">{source}</div>
-                </div>
-                <div style="margin-top:0.5rem;">
-            """,
+            f'<div class="panel-flush" style="margin-bottom:1rem;">'
+            f'<div class="important-header"><span class="important-title">🟡 If time allows</span></div>',
             unsafe_allow_html=True,
         )
-        value, changed = _render_widget(merchant_id, req, entry, None)
-        _finalize(answers, req["id"], value, entry, changed)
-        st.markdown("</div></div>", unsafe_allow_html=True)
+        for req in important:
+            entry = _existing(answers, req["id"])
+            source_chips = ""
+            if entry:
+                src = entry.get("source")
+                if src == "crm":
+                    source_chips = ui.chip("CRM known", "blue")
+                elif src == "ai":
+                    source_chips = ui.chip("AI extracted" if not entry.get("confirmed") else "AI confirmed", "accent")
+                else:
+                    source_chips = ui.chip("Confirmed", "green")
+            parent = req.get("condition", {}).get("field")
+            child = f'<span class="q-help">after “{_label(parent)}”</span>' if parent else ""
+
+            c1, c2 = st.columns([3.2, 2.4], gap="small")
+            with c1:
+                st.markdown(
+                    f'<div style="padding:0.42rem 0.25rem 0.42rem 1rem;"><span class="q-label" style="color:{ui.MUTED};">{req["question"]}</span>'
+                    f'<div style="display:flex; gap:0.3rem; margin-top:0.15rem;">{child}{source_chips}</div></div>',
+                    unsafe_allow_html=True,
+                )
+            with c2:
+                value, changed = _render_widget(merchant_id, req, entry, None)
+                _finalize(answers, req["id"], value, entry, changed)
+            if req is not important[-1]:
+                st.markdown('<div style="border-top:1px solid #EFF0F1; margin:0 1rem;"></div>', unsafe_allow_html=True)
+
+        st.markdown("</div>", unsafe_allow_html=True)
 
     return answers
-
-
-def _label(req_id: str) -> str:
-    from services import load_requirements
-    for r in load_requirements():
-        if r["id"] == req_id:
-            return r["label"]
-    return req_id

@@ -70,19 +70,19 @@ def test_route9_ui_walkthrough():
             break
     at.run()
     assert not at.exception
-    sub = [b for b in at.button if b.label == "Submit Discovery"][0]
+    sub = [b for b in at.button if b.label == "Submit discovery"][0]
     assert sub.disabled is True, "submission must be blocked with critical gaps"
     print("  ui: submission blocked initially = True")
 
     [x for x in at.multiselect if x.key == "ans_route9_age_products"][0].set_value(["Tobacco"]).run()
-    [x for x in at.radio if x.label == "How is age verification handled today?"][0].set_value("Scanner at register").run()
+    [x for x in at.radio if x.key == "ans_route9_age_verification_today"][0].set_value("Scanner at register").run()
     [x for x in at.button_group if x.key == "ans_route9_age_pos_enforced"][0].set_value("Yes").run()
-    sub = [b for b in at.button if b.label == "Submit Discovery"][0]
+    sub = [b for b in at.button if b.label == "Submit discovery"][0]
     assert sub.disabled is False, "submission must enable once critical gaps closed"
     print("  ui: submission enabled after answering chain = True")
 
     [x for x in at.text_area if x.key == "notes_route9"][0].set_value("Compliance is top priority.").run()
-    sub = [b for b in at.button if b.label == "Submit Discovery"][0]
+    sub = [b for b in at.button if b.label == "Submit discovery"][0]
     sub.click().run()
     assert not at.exception
     md = " ".join(m.value for m in at.markdown)
@@ -96,7 +96,7 @@ def test_route9_ui_walkthrough():
 def test_control_center():
     at = stt.AppTest.from_file("app.py", default_timeout=30)
     at.run()
-    at.radio[0].set_value("RevOps Director").run()
+    at.radio[0].set_value("RevOps").run()
     assert not at.exception
     assert len(at.selectbox) == 6, "vertical, rep, region, size, week, governance filters"
     # week filter present + reacts

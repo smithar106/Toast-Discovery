@@ -1,4 +1,4 @@
-"""Sales Rep experience: This Week → Merchant Playbook → Submit → Handoff."""
+"""Sales Rep experience: This Week agenda → Merchant Playbook → Submit → Handoff."""
 from __future__ import annotations
 
 import streamlit as st
@@ -33,13 +33,13 @@ def _is_submitted(merchant_id: str) -> bool:
 
 def render() -> None:
     ui.page_header(
-        "Toast Retail Discovery · Sales",
-        "This Week",
+        "Sales · This week",
+        "Discovery agenda",
         "Know what you cannot afford to leave without knowing.",
     )
     st.markdown(
-        f'<div class="muted small" style="margin-bottom:1rem;">Rep: <b style="color:{ui.INK};">Maya Chen</b> · '
-        f'Northeast region · Viewing the week of Aug 24, 2026</div>',
+        f'<div class="muted small" style="margin-bottom:0.9rem;">Rep: <b style="color:{ui.INK};">Maya Chen</b> · '
+        f'Northeast · week of Aug 24, 2026</div>',
         unsafe_allow_html=True,
     )
 
@@ -49,16 +49,16 @@ def render() -> None:
 
     merchants = load_merchants()
     sorted_m = sorted(merchants, key=lambda m: (m["meeting_date"], m["meeting_time"]))
+    st.markdown('<div class="section-title">Upcoming meetings</div>', unsafe_allow_html=True)
     for merchant in sorted_m:
         answers = _init_session(merchant)
         merchant_card.merchant_card(merchant, answers)
-        col1, _ = st.columns([1, 5])
-        with col1:
-            if st.button("Open Discovery Playbook", key=f"open_{merchant['id']}", width="stretch"):
-                st.session_state["rep_view"] = "playbook"
-                st.session_state["active_merchant"] = merchant["id"]
-                st.rerun()
-        st.write("")
+    st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
+    st.markdown(
+        '<div class="foot">Critical items are the information that can change viability, implementation design, '
+        'or cause rework. That is what this agenda keeps front of mind.</div>',
+        unsafe_allow_html=True,
+    )
 
 
 def _render_playbook() -> None:
@@ -68,7 +68,7 @@ def _render_playbook() -> None:
         st.session_state["rep_view"] = "home"
         st.rerun()
 
-    if st.button("← Back to This Week"):
+    if st.button("← Back to agenda"):
         st.session_state["rep_view"] = "home"
         st.rerun()
 
@@ -78,8 +78,6 @@ def _render_playbook() -> None:
     vname = load_verticals().get(merchant["vertical"], {}).get("name", merchant["vertical"])
 
     _render_header(merchant, vname, evaluation)
-    ui.page_header("", "Discovery Playbook", "")
-
     _render_known_context(merchant)
 
     if _is_submitted(merchant["id"]):
@@ -88,7 +86,7 @@ def _render_playbook() -> None:
         handoff_comp.render_handoff(merchant, answers, st.session_state.get(notes_key, ""), summary)
         st.markdown(
             """
-            <div class="card" style="margin-top:1rem;">
+            <div class="panel" style="margin-top:1rem;">
                 <div class="section-title">Submission confirmations</div>
                 <div class="small" style="line-height:1.9;">
                 ✅ Salesforce opportunity updated<br>
@@ -102,37 +100,47 @@ def _render_playbook() -> None:
         )
         return
 
-    _render_context_insight(merchant, answers, evaluation)
-    discovery_form.render_discovery_form(merchant, answers)
-    _render_additional_context(merchant, answers, evaluation)
+    _render_context_brief(merchant, answers, evaluation)
+    discovery_form.render_discovery_form(merchant, answers, evaluation)
     evaluation = evaluate_merchant(merchant, answers)
+    _render_additional_context(merchant, answers, evaluation)
     _render_submission(merchant, answers, evaluation, notes_key)
 
 
 def _render_header(merchant: dict, vname: str, evaluation: dict) -> None:
     dm = merchant.get("decision_maker") or {}
+    n_missing = len(evaluation["critical_missing"])
+    n_crit = evaluation["critical_total"]
+
+    if n_missing:
+        primary = f'{n_missing} critical requirement{"s" if n_missing != 1 else ""} remaining'
+        sub = f'{evaluation["critical_complete"]} of {n_crit} critical confirmed'
+        primary_color = ui.RED
+    else:
+        primary = "✓ Ready for handoff"
+        sub = f'{n_crit} of {n_crit} critical confirmed'
+        primary_color = ui.GREEN
+
     st.markdown(
         f"""
-        <div class="card" style="margin-bottom:1rem;">
-            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:1rem; flex-wrap:wrap;">
+        <div class="panel" style="margin-bottom:1rem; padding:1rem 1.15rem;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:1.5rem; flex-wrap:wrap;">
                 <div>
-                    <div class="eyebrow">Merchant discovery workspace</div>
-                    <div style="font-size:1.3rem; font-weight:700; color:{ui.INK}; margin-top:0.15rem;">{merchant['name']}</div>
-                    <div class="muted small" style="margin-top:0.2rem;">
-                        {vname} · {merchant.get('locations',1)} location(s) · {merchant.get('region','')} · {merchant.get('stage','Discovery')} ·
-                        meeting {merchant['meeting_date']} at {merchant['meeting_time']}
+                    <div class="eyebrow">Discovery playbook · {merchant['meeting_date']} at {merchant['meeting_time']}</div>
+                    <div style="font-size:1.35rem; font-weight:700; letter-spacing:-0.02em; color:{ui.INK}; margin-top:0.1rem;">{merchant['name']}</div>
+                    <div class="muted small" style="margin-top:0.15rem;">
+                        {vname} · {merchant.get('locations',1)} location(s) · {merchant.get('region','')} · {merchant.get('stage','Discovery')} · ${merchant.get('opportunity_value',0):,}
                     </div>
                 </div>
-                <div style="text-align:right;">
-                    <div class="kpi-label">Discovery completeness</div>
-                    <div style="font-size:1.6rem; font-weight:700; color:{ui.ACCENT};">{evaluation['completeness_pct']}%</div>
-                    <div class="small muted">{evaluation['critical_complete']}/{evaluation['critical_total']} critical · {evaluation['total_scored']} total</div>
+                <div style="text-align:right; flex-shrink:0;">
+                    <div style="font-size:1.15rem; font-weight:700; color:{primary_color};">{primary}</div>
+                    <div class="small muted">{sub}</div>
                 </div>
             </div>
-            <div class="pill-row">
-                <span class="badge">Opportunity: ${merchant.get('opportunity_value',0):,}</span>
-                <span class="badge badge-accent">Rep: {merchant.get('rep_id','').replace('_',' ').title()}</span>
-                <span class="badge badge-blue">Decision maker: {dm.get('name','—')} {'✓ confirmed' if dm.get('confirmed') else '· to confirm'}</span>
+            <div class="pill-row" style="margin-top:0.6rem;">
+                <span class="chip chip-neutral">Decision maker: {dm.get('name','—')} {'✓' if dm.get('confirmed') else '· to confirm'}</span>
+                <span class="chip chip-neutral">Rep: Maya Chen</span>
+                <span class="chip chip-neutral">{merchant.get('meeting_type','In-person')}</span>
             </div>
         </div>
         """,
@@ -144,67 +152,72 @@ def _render_known_context(merchant: dict) -> None:
     known = merchant.get("known", {})
     if not known:
         return
-    st.markdown('<div class="section-title">Already known (from CRM)</div>', unsafe_allow_html=True)
     chips = "".join(
-        f'<span class="badge badge-blue" style="margin:2px 4px 2px 0;">{v.get("label", k)}: {v.get("value")}</span>'
+        f'<span class="chip chip-blue" style="margin:1px 3px 1px 0;">{v.get("label", k)}: {v.get("value")}</span>'
         for k, v in known.items()
     )
     st.markdown(
-        f'<div class="card" style="margin-bottom:1rem;"><div class="small muted" style="margin-bottom:0.4rem;">'
-        f'Prepopulated from Salesforce — you will not be asked to re-enter this.</div>{chips}</div>',
+        f'<div class="panel" style="margin-bottom:1rem; padding:0.7rem 1rem;">'
+        f'<div class="section-title">Already known · from CRM</div>'
+        f'<div style="font-size:0.8rem; margin-bottom:0.35rem;">{chips}</div>'
+        f'<div class="faint small">Prepopulated from Salesforce — you will not be asked to re-enter this.</div>'
+        f'</div>',
         unsafe_allow_html=True,
     )
 
 
-def _render_context_insight(merchant: dict, answers: dict, evaluation: dict) -> None:
+def _render_context_brief(merchant: dict, answers: dict, evaluation: dict) -> None:
     insight = ai_service.contextualize_merchant(merchant, answers, evaluation["critical_missing"])
-    label = "AI context · LLM" if ai_service.ai_available() else "Context · built-in"
+    # enforce 1-2 sentences for glanceability
+    sentences = [s.strip() for s in insight.split(". ") if s.strip()][:2]
+    brief = ". ".join(sentences).strip()
+    label = "LLM" if ai_service.ai_available() else "Auto"
     st.markdown(
-        f'<div class="insight"><b>What matters most for this conversation</b> '
-        f'<span class="source-chip">{label}</span><div style="margin-top:0.4rem;">{insight}</div></div>',
+        f'<div class="brief" style="margin-bottom:1rem;">'
+        f'<div class="brief-title">Focus for this meeting · <span style="text-transform:none; letter-spacing:0; font-weight:500;">{label}</span></div>'
+        f'<div style="font-size:0.92rem; color:{ui.INK};">{brief}</div>'
+        f'</div>',
         unsafe_allow_html=True,
     )
 
 
 def _render_additional_context(merchant: dict, answers: dict, evaluation: dict) -> None:
     st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
-    st.markdown('<div class="section-title" style="font-size:1.05rem;">Add additional context</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">Additional context</div>', unsafe_allow_html=True)
     notes_key = f"notes_{merchant['id']}"
-    notes = st.text_area(
-        "Free-text notes & merchant observations",
+    st.text_area(
+        "Free-text notes",
         value=st.session_state.get(notes_key, ""),
         key=notes_key,
-        height=110,
+        height=80,
         label_visibility="collapsed",
-        placeholder="e.g. Dana emphasized compliance concerns around fuel price signage; store manager will own training.",
+        placeholder="Merchant observations, priorities, open questions…",
     )
 
-    st.markdown('<div class="section-title" style="margin-top:0.8rem;">Upload recording (optional)</div>', unsafe_allow_html=True)
+    st.markdown('<div style="margin-top:0.5rem;"></div>', unsafe_allow_html=True)
     up_key = f"rec_{merchant['id']}"
     uploaded = st.file_uploader(
-        "Upload a meeting recording (mp3, wav, m4a, ogg)",
+        "Upload recording (mp3, wav, m4a, ogg)",
         type=["mp3", "wav", "m4a", "ogg"],
         key=up_key,
         label_visibility="collapsed",
     )
-    ai_facts = []
     if uploaded is not None:
         st.markdown(
             f'<div class="note" style="margin-bottom:0.6rem;">Recording received: <b>{uploaded.name}</b>. '
-            f'Simulated transcription + AI fact extraction running…</div>',
+            f'Simulated transcription + AI extraction running…</div>',
             unsafe_allow_html=True,
         )
-        # Simulate extraction: first run only, deterministic from filename+notes
         fact_key = f"ai_facts_{merchant['id']}"
         if fact_key not in st.session_state:
+            notes = st.session_state.get(notes_key, "")
             combined = f"{notes} {uploaded.name.replace('-', ' ').replace('_', ' ')}"
-            extracted = ai_service.extract_facts_from_text(combined, merchant)
-            st.session_state[fact_key] = extracted
+            st.session_state[fact_key] = ai_service.extract_facts_from_text(combined, merchant)
         ai_facts = st.session_state.get(fact_key, [])
         if ai_facts:
             st.markdown(
-                '<div class="muted small" style="margin-bottom:0.4rem;">Candidate facts extracted from recording — '
-                'AI output is labeled and only counts once you confirm it:</div>',
+                '<div class="faint small" style="margin-bottom:0.4rem;">Candidate facts — AI output is labeled '
+                'and only counts once you confirm it:</div>',
                 unsafe_allow_html=True,
             )
             for fact in ai_facts:
@@ -212,7 +225,8 @@ def _render_additional_context(merchant: dict, answers: dict, evaluation: dict) 
                 col1, col2 = st.columns([4, 1])
                 with col1:
                     st.markdown(
-                        f'<div class="req-card"><b>{fact["label"]}</b><div class="small muted">{fact["value"]}</div></div>',
+                        f'<div class="panel" style="padding:0.5rem 0.75rem;"><b style="font-size:0.88rem;">{fact["label"]}</b>'
+                        f'<div class="small muted">{fact["value"]}</div></div>',
                         unsafe_allow_html=True,
                     )
                 with col2:
@@ -223,12 +237,8 @@ def _render_additional_context(merchant: dict, answers: dict, evaluation: dict) 
                 elif fact["id"] in answers and answers[fact["id"]].get("source") == "ai":
                     answers[fact["id"]]["confirmed"] = False
 
-    # expose real AI extraction when key present
     if ai_service.ai_available() and uploaded is not None:
-        st.markdown(
-            f'<div class="foot">Live LLM extraction active (OpenAI key detected).</div>',
-            unsafe_allow_html=True,
-        )
+        st.markdown('<div class="foot">Live LLM extraction active (OpenAI key detected).</div>', unsafe_allow_html=True)
 
 
 def _render_submission(merchant: dict, answers: dict, evaluation: dict, notes_key: str) -> None:
@@ -236,33 +246,35 @@ def _render_submission(merchant: dict, answers: dict, evaluation: dict, notes_ke
     ready = evaluation["ready"]
 
     if not ready:
+        n = len(evaluation["critical_missing"])
+        items = "".join(
+            f'<li style="margin-bottom:0.2rem;"><b>{r["label"]}</b></li>' for r in evaluation["critical_missing"]
+        )
         st.markdown(
-            f'<div class="card" style="border-color:#F5C6C2; background:#FFF7F6;">'
-            f'<div class="section-title" style="color:{ui.RED};">Before you leave</div>'
-            f'<div class="small" style="margin-top:0.2rem;"><b>{len(evaluation["critical_missing"])} critical '
-            f'requirement{"s" if len(evaluation["critical_missing"]) != 1 else ""} remain</b> — '
-            f'you cannot afford to leave without knowing these:</div>'
-            f'<ul style="margin:0.5rem 0 0 1.1rem; color:{ui.INK};">'
-            + "".join(f'<li><b>{r["label"]}</b> <span class="muted small">(vertical: {r["vertical"]})</span></li>' for r in evaluation["critical_missing"])
-            + '</ul></div>',
+            f'<div class="panel" style="border:1px solid #F2D8D4; background:#FDF6F5; padding:0.9rem 1rem;">'
+            f'<div class="section-title" style="color:{ui.RED};">Before you leave · {n} critical item{"s" if n != 1 else ""} remain</div>'
+            f'<div class="small muted" style="margin-top:0.15rem;">You cannot afford to leave without knowing these:</div>'
+            f'<ul style="margin:0.45rem 0 0 1.1rem; color:{ui.INK};">{items}</ul>'
+            f'</div>',
             unsafe_allow_html=True,
         )
         if evaluation["important_missing"]:
             st.markdown(
-                f'<div class="small muted" style="margin-top:0.5rem;">Important (non-blocking) open: '
+                f'<div class="small muted" style="margin-top:0.5rem;">Optional, if time allows: '
                 f'{", ".join(r["label"] for r in evaluation["important_missing"])}</div>',
                 unsafe_allow_html=True,
             )
-        st.button("Submit Discovery", disabled=True, width="stretch",
+        st.button("Submit discovery", disabled=True, width="stretch",
                   help="Complete all critical requirements to submit.", type="primary")
     else:
         st.markdown(
-            f'<div class="card" style="border-color:#CBE7D8; background:#F2FAF5;">'
-            f'<div class="section-title" style="color:{ui.GREEN};">All critical requirements complete</div>'
-            f'<div class="small muted">Discovery is ready to submit. This will update the opportunity in Salesforce '
-            f'and generate the onboarding handoff.</div></div>',
+            f'<div class="panel" style="border:1px solid #CFE5D8; background:#F3F9F5; padding:0.9rem 1rem;">'
+            f'<div class="section-title" style="color:{ui.GREEN};">✓ Ready for handoff</div>'
+            f'<div class="small muted">All critical requirements confirmed ({evaluation["critical_total"]} of '
+            f'{evaluation["critical_total"]}). Submitting updates Salesforce and generates the onboarding handoff.</div>'
+            f'</div>',
             unsafe_allow_html=True,
         )
-        if st.button("Submit Discovery", width="stretch", type="primary"):
+        if st.button("Submit discovery", width="stretch", type="primary"):
             st.session_state[f"submitted_{merchant['id']}"] = True
             st.rerun()
