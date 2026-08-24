@@ -10,7 +10,7 @@ from __future__ import annotations
 import json
 import os
 
-from services import load_verticals
+from services import load_extractions, load_verticals
 
 OPENAI_KEY = os.environ.get("OPENAI_API_KEY", "")
 MODEL = os.environ.get("TOAST_OPENAI_MODEL", "gpt-4o-mini")
@@ -260,10 +260,63 @@ def _focus_approach(meta: dict, merchant: dict, req_id: str = "") -> str:
     return f"Confirm {meta.get('label', 'this requirement').lower()} with the merchant directly."
 
 
-def meeting_analysis(merchant_id: str) -> dict | None:
-    """Return the mock extraction set for a merchant, or None if none exists."""
-    from services import load_extractions
-    return load_extractions().get(merchant_id)
+def meeting_analysis(merchant: dict, transcript: str = "") -> dict:
+    """Extract discovery evidence from meeting context.
+
+    When an OpenAI key is present, the LLM reads the transcript/notes and returns
+    structured candidate facts + a summary, grounded in this merchant's governed
+    requirements. Without a key (or on failure), the pre-authored mock extraction
+    set is returned so the demo always works offline.
+    """
+    mock = load_extractions().get(merchant["id"]) or {"extractions": [], "gaps": []}
+
+    if not OPENAI_KEY or not transcript.strip():
+        return mock
+
+    from services import load_requirements
+    reqs = [r for r in load_requirements() if r.get("vertical") in ("all", merchant["vertical"])]
+    req_summary = "; ".join(
+        f"{r['id']} = {r['label']}" for r in reqs[:24]
+    )
+
+    prompt = (
+        f"You are assisting a Toast sales rep. Merchant: {merchant['name']} "
+        f"({merchant['vertical']}, {merchant.get('locations', 1)} locations).\n\n"
+        f"These are the governed discovery requirements for this merchant type:\n{req_summary}\n\n"
+        f"Below is the rep's meeting context (notes and/or a simulated transcript). "
+        f"Extract candidate answers ONLY where the text provides evidence.\n\n"
+        f"Meeting context:\n{transcript[:6000]}\n\n"
+        f"Return JSON with exactly two keys:\n"
+        f"  'summary': a 2-3 sentence plain-text meeting summary.\n"
+        f"  'extractions': a list of {{'req_id','label','suggested_value','evidence','confidence'}} "
+        f"where req_id is one of the requirement ids above and evidence is a short quote from the context. "
+        f"Do NOT invent facts that are not in the context. If nothing is supported, return an empty list.\n"
+        f"Plain JSON only."
+    )
+    out = _chat([{"role": "user", "content": prompt}])
+    if out:
+        try:
+            start, end = out.find("{"), out.rfind("}") + 1
+            data = json.loads(out[start:end])
+            extractions = data.get("extractions", []) or []
+            return {
+                "summary": data.get("summary", ""),
+                "extractions": [
+                    {
+                        "req_id": e.get("req_id", ""),
+                        "label": e.get("label", e.get("req_id", "Extracted item")),
+                        "suggested_value": e.get("suggested_value", ""),
+                        "evidence": e.get("evidence", ""),
+                        "confidence": e.get("confidence", "medium"),
+                    }
+                    for e in extractions[:8]
+                    if e.get("req_id") and e.get("suggested_value")
+                ],
+                "gaps": [],
+            }
+        except Exception:
+            pass
+    return mock
 
 
 def draft_follow_up(merchant: dict, gaps: list[dict]) -> str:

@@ -344,14 +344,18 @@ def _render_meeting_context(merchant: dict, answers: dict, notes_key: str, evalu
         ):
             with st.spinner("Interpreting the meeting against governed requirements…"):
                 time.sleep(1.6)
+            transcript = st.session_state.get(notes_key, "").strip()
+            if uploaded is not None:
+                transcript += f"\n[Audio file: {uploaded.name} — simulated transcript of the meeting]"
             st.session_state[f"extracted_{merchant['id']}"] = True
+            st.session_state[f"analysis_{merchant['id']}"] = ai_service.meeting_analysis(merchant, transcript)
             st.rerun()
     else:
         _render_meeting_analysis(merchant, answers, notes_key, evaluation)
 
 
 def _render_meeting_analysis(merchant: dict, answers: dict, notes_key: str, evaluation: dict) -> None:
-    analysis = ai_service.meeting_analysis(merchant["id"]) or {"extractions": [], "gaps": []}
+    analysis = st.session_state.get(f"analysis_{merchant['id']}") or {"extractions": [], "gaps": []}
 
     st.markdown(
         '<div class="section-title" style="margin-top:1rem;">Outstanding items before submission</div>',
@@ -495,7 +499,7 @@ def _render_gaps(merchant: dict, answers: dict, evaluation: dict) -> None:
     )
 
     # gaps: critical still missing (with extraction reasons where available)
-    analysis = ai_service.meeting_analysis(merchant["id"]) or {}
+    analysis = st.session_state.get(f"analysis_{merchant['id']}") or {}
     gap_reasons = {g["req_id"]: g["reason"] for g in analysis.get("gaps", [])}
     for r in evaluation["critical_missing"]:
         reason = gap_reasons.get(r["id"], "No sufficient evidence found in the meeting.")
