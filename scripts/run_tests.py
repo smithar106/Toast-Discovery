@@ -70,27 +70,81 @@ def test_route9_ui_walkthrough():
             break
     at.run()
     assert not at.exception
-    sub = [b for b in at.button if b.label == "Submit discovery"][0]
-    assert sub.disabled is True, "submission must be blocked with critical gaps"
-    print("  ui: submission blocked initially = True")
 
-    [x for x in at.multiselect if x.key == "ans_route9_age_products"][0].set_value(["Tobacco"]).run()
-    [x for x in at.radio if x.key == "ans_route9_age_verification_today"][0].set_value("Scanner at register").run()
-    [x for x in at.button_group if x.key == "ans_route9_age_pos_enforced"][0].set_value("Yes").run()
-    sub = [b for b in at.button if b.label == "Submit discovery"][0]
-    assert sub.disabled is False, "submission must enable once critical gaps closed"
-    print("  ui: submission enabled after answering chain = True")
+    # Prepare gate is shown first
+    md = " ".join(m.value for m in at.markdown)
+    assert "Ready to prepare for this meeting?" in md
+    prepare = [b for b in at.button if b.label == "Prepare for Meeting"][0]
+    prepare.click().run()
+    assert not at.exception
 
-    [x for x in at.text_area if x.key == "notes_route9"][0].set_value("Compliance is top priority.").run()
-    sub = [b for b in at.button if b.label == "Submit discovery"][0]
-    sub.click().run()
+    # Agenda shown: what we know + focus + governed requirements
+    md = " ".join(m.value for m in at.markdown)
+    assert "What we already know" in md
+    assert "Focus for this meeting" in md
+    assert "Governed requirements" in md
+    print("  ui: prepare gate -> personalized discovery agenda = True")
+
+    # Governed form still blocks completion until criticals confirmed
+    sub = [b for b in at.button if b.label == "Save & Send to Onboarding"]
+    assert not sub, "onboarding button must not appear with critical gaps"
+    print("  ui: onboarding blocked while critical gaps remain = True")
+
+    # Meeting context + Summarize & Extract -> confirm extracted answers
+    [x for x in at.text_area if x.key == "notes_route9"][0].set_value(
+        "Dana confirmed age verification is needed and wants POS enforcement.").run()
+    at.run()
+    extract_btn = [b for b in at.button if b.label == "Summarize & Extract"][0]
+    extract_btn.click().run()
+    assert not at.exception
+    md = " ".join(m.value for m in at.markdown)
+    assert "Meeting analysis" in md
+    assert "AI EXTRACTED" in md
+    print("  ui: summarize & extract surfaces AI evidence = True")
+
+    # Confirm the three age-verification extractions
+    for req in ("age_products", "age_verification_today", "age_pos_enforced"):
+        confirm = [b for b in at.button if b.key == f"confirm_extract_route9_{req}"][0]
+        confirm.click().run()
+        assert not at.exception
+    md = " ".join(m.value for m in at.markdown)
+    assert "Discovery complete" in md
+    assert any(b.label == "Save & Send to Onboarding" for b in at.button)
+    print("  ui: confirmed extractions -> deterministic validation -> complete = True")
+
+    # Send to onboarding -> handoff
+    [b for b in at.button if b.label == "Save & Send to Onboarding"][0].click().run()
     assert not at.exception
     md = " ".join(m.value for m in at.markdown)
     assert "Discovery submitted" in " ".join(s.value for s in at.success)
     assert "Salesforce opportunity updated" in md
     assert "Information provenance" in md
     assert "age verification" in md.lower()
-    print("  ui: submit -> handoff with confirmations + age verification = True")
+    print("  ui: onboarding handoff with age-verification requirement = True")
+
+
+def test_incomplete_post_meeting():
+    # Riverbend: extraction leaves decision authority unresolved -> onboarding blocked
+    at = stt.AppTest.from_file("app.py", default_timeout=30)
+    at.run()
+    for b in at.button:
+        if b.key == "open_riverbend":
+            b.click()
+            break
+    at.run()
+    [b for b in at.button if b.label == "Prepare for Meeting"][0].click().run()
+    [x for x in at.text_area if x.key == "notes_riverbend"][0].set_value(
+        "Elena joined the call and we discussed consolidation.").run()
+    at.run()
+    [b for b in at.button if b.label == "Summarize & Extract"][0].click().run()
+    assert not at.exception
+    md = " ".join(m.value for m in at.markdown)
+    assert "Discovery gaps remain" in md
+    assert "Decision authority" in md
+    send = [b for b in at.button if b.label == "Send to Onboarding"]
+    assert send and send[0].disabled, "onboarding must be blocked when criticals unresolved"
+    assert any(b.label == "Draft Follow-Up" for b in at.button)
+    print("  ui: incomplete meeting -> gaps remain -> onboarding blocked = True")
 
 
 def test_control_center():
@@ -158,6 +212,7 @@ def test_revenue_optimization_flow():
 if __name__ == "__main__":
     tests = [test_deterministic_validation, test_ai_facts_need_confirmation,
              test_handoff_includes_age_verification, test_route9_ui_walkthrough,
+             test_incomplete_post_meeting,
              test_control_center, test_revenue_optimization_flow]
     for t in tests:
         t()

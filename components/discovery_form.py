@@ -4,6 +4,9 @@ Compact single-panel design: requirements render as tight rows (label left,
 widget right) inside one Critical panel and one quieter Important panel. The
 panel header carries the "before you leave" count so the rep sees the minimum
 sufficient discovery state at a glance.
+
+Confirmed answers render as read-only rows (with a CONFIRMED chip) rather than
+live widgets — the rep is never asked to re-enter information already captured.
 """
 from __future__ import annotations
 
@@ -12,6 +15,14 @@ import streamlit as st
 from components import ui
 from services import load_requirements
 from services.discovery_engine import grouped_requirements
+
+
+def _format_value(value) -> str:
+    if isinstance(value, list):
+        return ", ".join(str(v) for v in value) if value else "—"
+    if isinstance(value, bool):
+        return "Yes" if value else "No"
+    return str(value) if value not in (None, "") else "—"
 
 
 def _existing(answers: dict, req_id: str) -> dict | None:
@@ -137,13 +148,29 @@ def render_discovery_form(merchant: dict, answers: dict, evaluation: dict) -> di
         if entry:
             src = entry.get("source")
             if src == "crm":
-                source_chips = ui.chip("CRM known", "blue")
+                source_chips = ui.chip("GOVERNED · from CRM", "blue")
             elif src == "ai":
-                source_chips = ui.chip("AI extracted" if not entry.get("confirmed") else "AI confirmed", "accent")
+                source_chips = ui.chip("AI ASSISTED · needs confirm" if not entry.get("confirmed") else "AI ASSISTED · confirmed", "accent")
             else:
-                source_chips = ui.chip("Confirmed", "green")
+                source_chips = ui.chip("CONFIRMED", "green")
         parent = req.get("condition", {}).get("field")
         child = f'<span class="q-help">after “{_label(parent)}”</span>' if parent else ""
+
+        is_confirmed = bool(entry and entry.get("confirmed"))
+        if is_confirmed:
+            st.markdown(
+                f'<div style="padding:0.5rem 1rem;">'
+                f'<div style="display:flex; justify-content:space-between; align-items:center; gap:0.6rem;">'
+                f'<span style="flex:1; min-width:0;"><span class="q-label">✓ {req["question"]}</span> '
+                f'<span class="faint small">{child}</span></span>'
+                f'<span style="display:flex; gap:0.3rem; align-items:center; flex-shrink:0;">'
+                f'<span class="small" style="font-weight:550; color:{ui.INK};">{_format_value(entry.get("value"))}</span>{source_chips}</span>'
+                f'</div></div>',
+                unsafe_allow_html=True,
+            )
+            if req is not critical[-1]:
+                st.markdown('<div style="border-top:1px solid #EFF0F1; margin:0 1rem;"></div>', unsafe_allow_html=True)
+            continue
 
         c1, c2 = st.columns([3.2, 2.4], gap="small")
         with c1:
@@ -172,13 +199,29 @@ def render_discovery_form(merchant: dict, answers: dict, evaluation: dict) -> di
             if entry:
                 src = entry.get("source")
                 if src == "crm":
-                    source_chips = ui.chip("CRM known", "blue")
+                    source_chips = ui.chip("GOVERNED · from CRM", "blue")
                 elif src == "ai":
-                    source_chips = ui.chip("AI extracted" if not entry.get("confirmed") else "AI confirmed", "accent")
+                    source_chips = ui.chip("AI ASSISTED · needs confirm" if not entry.get("confirmed") else "AI ASSISTED · confirmed", "accent")
                 else:
-                    source_chips = ui.chip("Confirmed", "green")
+                    source_chips = ui.chip("CONFIRMED", "green")
             parent = req.get("condition", {}).get("field")
             child = f'<span class="q-help">after “{_label(parent)}”</span>' if parent else ""
+
+            is_confirmed = bool(entry and entry.get("confirmed"))
+            if is_confirmed:
+                st.markdown(
+                    f'<div style="padding:0.5rem 1rem;">'
+                    f'<div style="display:flex; justify-content:space-between; align-items:center; gap:0.6rem;">'
+                    f'<span style="flex:1; min-width:0;"><span class="q-label" style="color:{ui.MUTED};">✓ {req["question"]}</span> '
+                    f'<span class="faint small">{child}</span></span>'
+                    f'<span style="display:flex; gap:0.3rem; align-items:center; flex-shrink:0;">'
+                    f'<span class="small" style="font-weight:550; color:{ui.INK};">{_format_value(entry.get("value"))}</span>{source_chips}</span>'
+                    f'</div></div>',
+                    unsafe_allow_html=True,
+                )
+                if req is not important[-1]:
+                    st.markdown('<div style="border-top:1px solid #EFF0F1; margin:0 1rem;"></div>', unsafe_allow_html=True)
+                continue
 
             c1, c2 = st.columns([3.2, 2.4], gap="small")
             with c1:

@@ -1,0 +1,81 @@
+{
+  "_comment": "Structured CRM / prior-context facts per merchant. provenance: Salesforce | Previous conversation | CRM + previous conversation. status: confirmed | extracted | needs_confirmation | unknown.",
+  "crm_context": {
+    "route9": {
+      "heading": "Convenience + Fuel · 3 locations",
+      "facts": [
+        { "label": "Location count", "value": "3", "provenance": "Salesforce", "status": "confirmed" },
+        { "label": "POS / payment needs discussed", "value": "Yes", "provenance": "Salesforce", "status": "confirmed" },
+        { "label": "Actively considering Toast", "value": "Yes", "provenance": "Salesforce", "status": "confirmed" },
+        { "label": "Age-restricted products", "value": "Tobacco and beer at counter", "provenance": "Salesforce", "status": "confirmed" },
+        { "label": "Decision maker", "value": "Dana Whitfield (Owner / Operator)", "provenance": "CRM + previous conversation", "status": "needs_confirmation" },
+        { "label": "Existing POS", "value": "Legacy Verifone install", "provenance": "Previous conversation", "status": "extracted" }
+      ]
+    },
+    "riverbend": {
+      "heading": "Independent Grocery · 1 location",
+      "facts": [
+        { "label": "Location count", "value": "1", "provenance": "Salesforce", "status": "confirmed" },
+        { "label": "Interested in consolidation", "value": "Yes", "provenance": "Salesforce", "status": "confirmed" },
+        { "label": "Primary contact", "value": "Marcus Boyd (Store Manager)", "provenance": "Salesforce", "status": "confirmed" },
+        { "label": "Current POS", "value": "Square", "provenance": "Previous conversation", "status": "extracted" },
+        { "label": "Decision authority", "value": "Elena Boyd, Co-owner", "provenance": "CRM + previous conversation", "status": "needs_confirmation" }
+      ]
+    },
+    "golden_harvest": {
+      "heading": "Grocery / Multi-location · 6 locations",
+      "facts": [
+        { "label": "Location count", "value": "6", "provenance": "Salesforce", "status": "confirmed" },
+        { "label": "Decision maker", "value": "Sandra Osei (Dir. Ops)", "provenance": "Salesforce", "status": "confirmed" },
+        { "label": "Centralized buying", "value": "Yes", "provenance": "Salesforce", "status": "confirmed" },
+        { "label": "Scale vendor", "value": "NBI SmartTouch", "provenance": "Previous conversation", "status": "extracted" },
+        { "label": "Online ordering", "value": "Mercato", "provenance": "Previous conversation", "status": "extracted" }
+      ]
+    },
+    "cornermart": {
+      "heading": "Convenience + Fuel · 2 locations",
+      "facts": [
+        { "label": "Location count", "value": "2", "provenance": "Salesforce", "status": "confirmed" },
+        { "label": "Decision maker", "value": "Hector Ruiz (Franchise Owner)", "provenance": "Salesforce", "status": "confirmed" },
+        { "label": "Lottery sales", "value": "Yes — dedicated terminal", "provenance": "Salesforce", "status": "confirmed" },
+        { "label": "Age-restricted products", "value": "Tobacco, vaping", "provenance": "Previous conversation", "status": "extracted" }
+      ]
+    },
+    "alpine": {
+      "heading": "Meat & Seafood · 2 locations",
+      "facts": [
+        { "label": "Location count", "value": "2", "provenance": "Salesforce", "status": "confirmed" },
+        { "label": "Decision maker", "value": "Paul Niedermeyer (Co-owner)", "provenance": "Salesforce", "status": "confirmed" },
+        { "label": "Custom cut program", "value": "Yes", "provenance": "Salesforce", "status": "confirmed" },
+        { "label": "Scale-based pricing", "value": "Yes", "provenance": "Salesforce", "status": "confirmed" },
+        { "label": "Label printer", "value": "Sato CL4NX", "provenance": "Previous conversation", "status": "extracted" }
+      ]
+    },
+    "fern_field": {
+      "heading": "Specialty Food · 2 locations",
+      "facts": [
+        { "label": "Location count", "value": "2", "provenance": "Salesforce", "status": "confirmed" },
+        { "label": "Decision maker", "value": "Ruth Ellison (Founder)", "provenance": "Salesforce", "status": "confirmed" },
+        { "label": "Online business", "value": "Shopify", "provenance": "Salesforce", "status": "confirmed" },
+        { "label": "Gift cards", "value": "Yes", "provenance": "Previous conversation", "status": "extracted" }
+      ]
+    },
+    "northline": {
+      "heading": "General Retail · 4 locations",
+      "facts": [
+        { "label": "Location count", "value": "4", "provenance": "Salesforce", "status": "confirmed" },
+        { "label": "Serialized tracking", "value": "Yes — furniture", "provenance": "Salesforce", "status": "confirmed" },
+        { "label": "Decision maker", "value": "Greg Hannon (CEO) — unconfirmed", "provenance": "CRM + previous conversation", "status": "needs_confirmation" },
+        { "label": "SKU volume", "value": "~4,500", "provenance": "Previous conversation", "status": "extracted" }
+      ]
+    },
+    "spruce_bowl": {
+      "heading": "General Retail · 1 location",
+      "facts": [
+        { "label": "Location count", "value": "1", "provenance": "Salesforce", "status": "confirmed" },
+        { "label": "Decision maker", "value": "Kenji Morita (Owner)", "provenance": "Salesforce", "status": "confirmed" },
+        { "label": "Loyalty program", "value": "Yes", "provenance": "Previous conversation", "status": "extracted" }
+      ]
+    }
+  }
+}

@@ -37,6 +37,14 @@ def load_records() -> list[dict]:
     return _load("records.json")["records"]
 
 
+def load_crm_context() -> dict:
+    return _load("crm_context.json")["crm_context"]
+
+
+def load_extractions() -> dict:
+    return _load("extractions.json")["extractions"]
+
+
 def get_merchant(merchant_id: str) -> dict | None:
     for m in load_merchants():
         if m["id"] == merchant_id:

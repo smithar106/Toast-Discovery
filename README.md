@@ -26,42 +26,54 @@ Two ideas govern the architecture:
 | Capability | Where |
 | --- | --- |
 | Weekly merchant meeting agenda with critical-item counts | Sales Rep → This Week |
+| "Prepare for Meeting" — simulated agenda build | Sales Rep → merchant playbook |
+| What we already know (provenance + status badges) | Discovery agenda |
+| Focus for this meeting — contextual priorities | Discovery agenda |
+| Governed requirements (deterministic) with source badges | Discovery agenda |
 | Vertical-specific discovery playbooks (5 verticals) | Sales Rep → merchant playbook |
 | Conditional questions that react to earlier answers | Any playbook |
 | CRM-known info prepopulated, never re-entered | Playbook header |
 | "Before you leave" critical-gap blocking | Submission gate |
 | Critical-remaining as the primary rep metric (not %) | Playbook header + agenda |
-| Recording upload + simulated AI fact extraction (labeled, needs confirmation) | Additional context |
-| Deterministic completeness validation, blocked/enabled submission | Submission gate |
+| Summarize & Extract — AI evidence → rep Confirm/Edit | Meeting analysis |
+| Unconfirmed AI output never satisfies critical requirements | Meeting analysis |
+| Incomplete meeting → Discovery gaps remain → onboarding blocked | Meeting analysis |
+| Draft Follow-Up for unresolved items | Meeting analysis |
 | Onboarding handoff with per-field provenance | Post-submit artifact |
+| "How this works" — AI vs deterministic boundary | Discovery agenda expander |
 | Executive KPIs, week-over-week trends, segmentation filters | Control Center |
 | Reactive KPIs — KPI row recomputes when you segment | Control Center |
-| Critical-gap analysis, vertical & rep performance | Control Center |
-| Governed requirements library + governance activity | Control Center |
-| Insight panel ("what I'd investigate this week") | Control Center |
+| Unresolved governed requirements, vertical & rep performance | Control Center |
 | Revenue Optimization Plan — top friction drivers, 3 interventions each, Director decision → draft project plan | Revenue Optimization |
 
-**Flagship demo:** *Route 9 Fuel & Grab.* The merchant is 90% there but **age verification was never discussed** — the exact failure that historically caused rework and escalation. The playbook makes the gap impossible to miss, the rep answers it, conditional questions appear, discovery completes, and the onboarding handoff explicitly carries the confirmed age-verification requirement.
+**Flagship demo:** *Route 9 Fuel & Grab.* The merchant is 90% there but **age verification was never discussed** — the exact failure that historically caused rework and escalation. The playbook makes the gap impossible to miss; after the meeting the rep runs **Summarize & Extract**, confirms the extracted age-verification answers, and deterministic validation flips discovery to complete — and the onboarding handoff explicitly carries the confirmed requirement.
 
 ---
 
 ## Architecture
 
 ```
-Mock Salesforce / Merchant Data
-            ↓
-        Python App (Streamlit)
-            ↓
-Requirements Library + optional OpenAI API
-            ↓
- Prioritized Discovery Playbook
-            ↓
-      Streamlit UI (widgets → structured answers)
-            ↓
-        Deterministic Validation
-            ↓
-    Mock Salesforce Update → Onboarding Handoff
+GOVERNED TOAST REQUIREMENTS        MERCHANT CONTEXT
+"What must we know?"               CRM + notes + merchant information
+        ↓                                    ↓
+ Deterministic requirements engine        LLM interpretation
+        ↓                                    ↓
+STRUCTURED DISCOVERY STATE (confirmed / inferred / unknown)
+        ↓
+ Deterministic validation → remaining gaps
+        ↓
+ LLM contextualization → PERSONALIZED DISCOVERY AGENDA
+        ↓
+       Sales Rep conducts discovery
+        ↓
+ NOTES / RECORDING → LLM extraction → REP CONFIRMATION
+        ↓
+ Deterministic validation
+        ↓
+ Complete → onboarding   OR   Incomplete → resolve gaps
 ```
+
+The LLM interprets ambiguity. Deterministic logic governs the process. The rep remains in control.
 
 ```
 Toast-Discovery/
@@ -94,7 +106,9 @@ Toast-Discovery/
 │
 ├── data/
 │   ├── merchants.json          # fictional merchants + seeded CRM/discovery state
-│   ├── requirements.json       # governed requirements library
+│   ├── crm_context.json        # known facts with provenance + certainty status
+│   ├── extractions.json        # mock AI extraction evidence + unresolved gaps
+│   ├── requirements.json       # governed requirements library (deterministic)
 │   ├── verticals.json          # vertical metadata
 │   ├── reps.json               # fictional sales reps
 │   ├── metrics.json            # KPI targets, insights, governance events

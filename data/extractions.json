@@ -1,0 +1,149 @@
+{
+  "_comment": "Mock AI extraction results: what an LLM would interpret from meeting notes / recording against the governed requirements. Req ids reference requirements.json. gaps lists requirements with no sufficient evidence (drives the 'incomplete' demo).",
+  "extractions": {
+    "route9": {
+      "meeting": "Route 9 Fuel & Grab \u00b7 Aug 26, 10:00 AM \u00b7 In-person",
+      "source": "Recording + rep notes",
+      "extractions": [
+        {
+          "req_id": "age_products",
+          "label": "Age-restricted product categories",
+          "suggested_value": [
+            "Tobacco",
+            "Alcohol / beer & wine"
+          ],
+          "evidence": "\"We carry tobacco behind the counter and beer in the cooler.\"",
+          "source_note": "Recording \u00b7 04:12",
+          "confidence": "high"
+        },
+        {
+          "req_id": "age_verification_today",
+          "label": "Current age verification method",
+          "suggested_value": "Manual ID check",
+          "evidence": "\"Right now it's just whoever is on register checking IDs.\"",
+          "source_note": "Recording \u00b7 06:40",
+          "confidence": "high"
+        },
+        {
+          "req_id": "age_pos_enforced",
+          "label": "POS-enforced age verification",
+          "suggested_value": "Yes",
+          "evidence": "\"We'd want the register to block the sale until someone confirms age.\"",
+          "source_note": "Recording \u00b7 07:15",
+          "confidence": "high"
+        },
+        {
+          "req_id": "tobacco_workflows",
+          "label": "Tobacco workflows",
+          "suggested_value": "Yes \u2014 state reporting via scanner",
+          "evidence": "\"The state wants scanned tobacco sales reported monthly.\"",
+          "source_note": "Recording \u00b7 08:03",
+          "confidence": "medium"
+        }
+      ],
+      "gaps": []
+    },
+    "riverbend": {
+      "meeting": "Riverbend Grocery \u00b7 Aug 24, 1:30 PM \u00b7 Phone",
+      "source": "Call recording + rep notes",
+      "extractions": [
+        {
+          "req_id": "inventory_workflows",
+          "label": "Inventory workflows",
+          "suggested_value": "Approximately 4,200 active SKUs",
+          "evidence": "\"We have a little over four thousand active products.\"",
+          "source_note": "Recording \u00b7 03:28",
+          "confidence": "medium"
+        },
+        {
+          "req_id": "timeline",
+          "label": "Target timeline",
+          "suggested_value": "October",
+          "evidence": "\"We'd like everything running before the holiday season.\"",
+          "source_note": "Recording \u00b7 12:02",
+          "confidence": "medium"
+        }
+      ],
+      "gaps": [
+        {
+          "req_id": "decision_maker",
+          "label": "Decision authority",
+          "reason": "Elena Boyd participated in the call, but final purchasing authority was not established."
+        },
+        {
+          "req_id": "ebt_implementation",
+          "label": "EBT implementation approach",
+          "reason": "EBT was mentioned but the integrated-vs-terminal approach was not discussed."
+        }
+      ]
+    },
+    "cornermart": {
+      "meeting": "CornerMart \u00b7 Aug 25, 9:00 AM \u00b7 In-person",
+      "source": "Recording + rep notes",
+      "extractions": [
+        {
+          "req_id": "age_products",
+          "label": "Age-restricted product categories",
+          "suggested_value": [
+            "Tobacco",
+            "Vaping / nicotine"
+          ],
+          "evidence": "\"Tobacco and vapes are the main age-gated items.\"",
+          "source_note": "Recording \u00b7 02:45",
+          "confidence": "high"
+        },
+        {
+          "req_id": "age_verification_today",
+          "label": "Current age verification method",
+          "suggested_value": "Birthdate keyed at register",
+          "evidence": "\"Cashiers key the birthdate into the register today.\"",
+          "source_note": "Recording \u00b7 05:10",
+          "confidence": "high"
+        }
+      ],
+      "gaps": [
+        {
+          "req_id": "fuel_payment_types",
+          "label": "Fuel payment types",
+          "reason": "Fuel payments were not discussed in this meeting."
+        }
+      ]
+    },
+    "golden_harvest": {
+      "meeting": "Golden Harvest Grocery \u00b7 Aug 24, 9:00 AM \u00b7 Video",
+      "source": "Recording + rep notes",
+      "extractions": [],
+      "gaps": []
+    },
+    "alpine": {
+      "meeting": "Alpine Meat & Seafood Co. \u00b7 Aug 27, 11:00 AM \u00b7 Video",
+      "source": "Recording + rep notes",
+      "extractions": [],
+      "gaps": []
+    },
+    "fern_field": {
+      "meeting": "Fern & Field Provisions \u00b7 Aug 28, 9:00 AM \u00b7 Phone",
+      "source": "Call recording + rep notes",
+      "extractions": [],
+      "gaps": []
+    },
+    "northline": {
+      "meeting": "Northline Home Goods \u00b7 Aug 27, 2:30 PM \u00b7 In-person",
+      "source": "Recording + rep notes",
+      "extractions": [],
+      "gaps": [
+        {
+          "req_id": "decision_maker",
+          "label": "Decision maker",
+          "reason": "Greg Hannon was referenced but did not join; approval path unconfirmed."
+        }
+      ]
+    },
+    "spruce_bowl": {
+      "meeting": "Spruce Bowl Kitchen \u00b7 Aug 25, 1:30 PM \u00b7 Video",
+      "source": "Recording + rep notes",
+      "extractions": [],
+      "gaps": []
+    }
+  }
+}

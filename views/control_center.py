@@ -59,9 +59,9 @@ def render() -> None:
     st.markdown('<div class="section-title" style="margin-top:1rem;">Trends</div>', unsafe_allow_html=True)
     _render_trends(df)
 
-    st.markdown('<div class="section-title" style="margin-top:1rem;">Where requirements fail</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title" style="margin-top:1rem;">Unresolved governed requirements</div>', unsafe_allow_html=True)
     st.markdown(
-        '<div style="font-size:0.82rem; margin-bottom:0.5rem;">The governed requirements most often missed at submission — and the rework they cause downstream.</div>',
+        '<div style="font-size:0.82rem; margin-bottom:0.5rem;">The governed requirements most often unresolved at submission — and the rework they cause downstream.</div>',
         unsafe_allow_html=True,
     )
     _render_gap_analysis(df)

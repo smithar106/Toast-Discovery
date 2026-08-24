@@ -197,3 +197,97 @@ def draft_plan_narrative(driver: dict, option: dict, plan: dict) -> str:
     )
     out = _chat([{"role": "user", "content": prompt}])
     return out.strip() if out else ""
+
+
+# ---------------------------------------------------------------------------
+# Sales Rep — meeting focus, analysis, follow-up (AI with deterministic fallback)
+# ---------------------------------------------------------------------------
+
+def _requirement_meta(req_id: str) -> dict:
+    from services import load_requirements
+    for r in load_requirements():
+        if r["id"] == req_id:
+            return r
+    return {"id": req_id, "label": req_id, "rule": "", "question": ""}
+
+
+def meeting_focus(merchant: dict, answers: dict, critical_missing: list[dict]) -> list[dict]:
+    """Build 1-3 contextual priorities for this merchant's meeting.
+
+    The governed requirement is deterministic; what we know, the suggested
+    approach, and why it matters are the LLM contextualizing it for THIS merchant.
+    Deterministic fallback is used when no API key is present.
+    """
+    priorities = []
+    for req in critical_missing[:3]:
+        meta = _requirement_meta(req["id"])
+        priorities.append({
+            "req_id": req["id"],
+            "requirement": meta.get("label", req["id"]),
+            "what_we_know": _focus_what_we_know(merchant, req["id"]),
+            "suggested_approach": _focus_approach(meta, merchant),
+            "why_it_matters": meta.get("rule", "Required for a complete sales-to-onboarding handoff."),
+        })
+
+    if OPENAI_KEY and priorities:
+        req_text = "; ".join(p["requirement"] for p in priorities)
+        known_text = "; ".join(f"{k}: {v.get('value')}" for k, v in merchant.get("known", {}).items())
+        prompt = (
+            f"For merchant {merchant['name']} ({merchant['vertical']}), produce a JSON list of up to 3 priorities "
+            f"for a discovery meeting, one per unresolved requirement: {req_text}. Known context: {known_text}. "
+            f"Each item: {{'requirement','what_we_know','suggested_approach','why_it_matters'}}. "
+            f"Suggested approaches are direct questions the rep can ask the merchant. Plain JSON array only."
+        )
+        out = _chat([{"role": "user", "content": prompt}])
+        if out:
+            try:
+                start, end = out.find("["), out.rfind("]") + 1
+                data = json.loads(out[start:end])
+                if isinstance(data, list) and data:
+                    return data[:3]
+            except Exception:
+                pass
+    return priorities
+
+
+def _focus_what_we_know(merchant: dict, req_id: str) -> str:
+    known = merchant.get("known", {})
+    if req_id == "decision_maker":
+        dm = merchant.get("decision_maker") or {}
+        if dm.get("name"):
+            return (f"{dm['name']} is the primary contact, but it is not confirmed "
+                    "they hold final purchasing authority alone.")
+    if req_id in known:
+        return f"On record: {known[req_id].get('value')}."
+    return "No confirmed information on record yet."
+
+
+def _focus_approach(meta: dict, merchant: dict) -> str:
+    q = meta.get("question", "")
+    if q:
+        return f"Ask: \u201c{q}\u201d"
+    return f"Confirm {meta.get('label', 'this requirement').lower()} with the merchant directly."
+
+
+def meeting_analysis(merchant_id: str) -> dict | None:
+    """Return the mock extraction set for a merchant, or None if none exists."""
+    from services import load_extractions
+    return load_extractions().get(merchant_id)
+
+
+def draft_follow_up(merchant: dict, gaps: list[dict]) -> str:
+    """Draft a follow-up message to the merchant for unresolved requirements."""
+    labels = ", ".join(f'"{g["label"]}"' for g in gaps) if gaps else "the remaining open items"
+    if OPENAI_KEY:
+        prompt = (
+            f"Draft a short, professional follow-up email to {merchant['name']} asking to resolve these "
+            f"discovery items before onboarding can proceed: {labels}. 3-4 sentences, plain text."
+        )
+        out = _chat([{"role": "user", "content": prompt}])
+        if out:
+            return out.strip()
+    return (
+        f"Hi there,\n\nThank you for your time earlier. Before we hand off to the onboarding team, we need "
+        f"to confirm a few remaining details: {labels}. If you can share those at your convenience, we can "
+        f"keep everything on track for a smooth go-live.\n\nThanks,\nMaya Chen"
+    )
