@@ -12,22 +12,31 @@ import os
 
 from services import load_extractions, load_verticals
 
-OPENAI_KEY = os.environ.get("OPENAI_API_KEY", "")
-MODEL = os.environ.get("TOAST_OPENAI_MODEL", "gpt-4o-mini")
+API_KEY = (
+    os.environ.get("DEEPSEEK_API_KEY")
+    or os.environ.get("AI_API_KEY")
+    or os.environ.get("OPENAI_API_KEY")
+    or ""
+)
+MODEL = os.environ.get("TOAST_LLM_MODEL") or os.environ.get("AI_MODEL") or "deepseek-chat"
+BASE_URL = os.environ.get("DEEPSEEK_BASE_URL") or os.environ.get("AI_BASE_URL") or "https://api.deepseek.com"
 
 
 def ai_available() -> bool:
-    return bool(OPENAI_KEY)
+    return bool(API_KEY)
 
 
-def _chat(messages: list[dict]) -> str | None:
-    if not OPENAI_KEY:
+def _chat(messages: list[dict], json_mode: bool = False) -> str | None:
+    if not API_KEY:
         return None
     try:
         import openai
 
-        client = openai.OpenAI(api_key=OPENAI_KEY)
-        resp = client.chat.completions.create(model=MODEL, messages=messages, temperature=0.2)
+        client = openai.OpenAI(api_key=API_KEY, base_url=BASE_URL)
+        kwargs = {"model": MODEL, "messages": messages, "temperature": 0.2}
+        if json_mode:
+            kwargs["response_format"] = {"type": "json_object"}
+        resp = client.chat.completions.create(**kwargs)
         return resp.choices[0].message.content
     except Exception:
         return None
@@ -41,7 +50,7 @@ def contextualize_merchant(merchant: dict, answers: dict, critical_missing: list
     locs = merchant.get("locations", 1)
     notes = merchant.get("notes", "")
 
-    if not OPENAI_KEY:
+    if not API_KEY:
         return _fallback_context(merchant, answers, critical_missing, vname, known, locs, notes)
 
     req_text = ", ".join(r["label"] for r in critical_missing) if critical_missing else "none"
@@ -78,7 +87,7 @@ def extract_facts_from_text(text: str, merchant: dict) -> list[dict]:
     call the LLM, but the output shape (id, label, value, source='ai',
     confirmed=False) stays identical.
     """
-    if not OPENAI_KEY:
+    if not API_KEY:
         return _fallback_extract(text, merchant)
     prompt = (
         f"From the following merchant discovery notes, extract up to 4 discrete factual claims as JSON "
@@ -120,7 +129,7 @@ def _fallback_extract(text: str, merchant: dict) -> list[dict]:
 
 def generate_summary(merchant: dict, answers: dict, notes: str) -> str:
     """Short narrative summary for the onboarding handoff."""
-    if not OPENAI_KEY:
+    if not API_KEY:
         return _fallback_summary(merchant, answers, notes)
     known_text = "; ".join(f"{k}: {v.get('value')}" for k, v in (merchant.get("known") or {}).items())
     answered = "; ".join(f"{k}: {answers.get(k, {}).get('value') if isinstance(answers.get(k), dict) else answers.get(k)}" for k in answers)
@@ -199,7 +208,7 @@ def meeting_focus(merchant: dict, answers: dict, critical_missing: list[dict]) -
             "important context and the target timeline."
         )
 
-    if OPENAI_KEY and priorities:
+    if API_KEY and priorities:
         req_text = "; ".join(p["requirement"] for p in priorities)
         known_text = "; ".join(f"{k}: {v.get('value')}" for k, v in merchant.get("known", {}).items())
         prompt = (
@@ -209,7 +218,7 @@ def meeting_focus(merchant: dict, answers: dict, critical_missing: list[dict]) -
             f"{req_text}. Known context: {known_text}. Suggested approaches are natural, direct questions the "
             f"rep can ask the merchant. Plain JSON only."
         )
-        out = _chat([{"role": "user", "content": prompt}])
+        out = _chat([{"role": "user", "content": prompt}], json_mode=True)
         if out:
             try:
                 start, end = out.find("{"), out.rfind("}") + 1
@@ -270,7 +279,7 @@ def meeting_analysis(merchant: dict, transcript: str = "") -> dict:
     """
     mock = load_extractions().get(merchant["id"]) or {"extractions": [], "gaps": []}
 
-    if not OPENAI_KEY or not transcript.strip():
+    if not API_KEY or not transcript.strip():
         return mock
 
     from services import load_requirements
@@ -293,7 +302,7 @@ def meeting_analysis(merchant: dict, transcript: str = "") -> dict:
         f"Do NOT invent facts that are not in the context. If nothing is supported, return an empty list.\n"
         f"Plain JSON only."
     )
-    out = _chat([{"role": "user", "content": prompt}])
+    out = _chat([{"role": "user", "content": prompt}], json_mode=True)
     if out:
         try:
             start, end = out.find("{"), out.rfind("}") + 1
@@ -322,7 +331,7 @@ def meeting_analysis(merchant: dict, transcript: str = "") -> dict:
 def draft_follow_up(merchant: dict, gaps: list[dict]) -> str:
     """Draft a follow-up message to the merchant for unresolved requirements."""
     labels = ", ".join(f'"{g["label"]}"' for g in gaps) if gaps else "the remaining open items"
-    if OPENAI_KEY:
+    if API_KEY:
         prompt = (
             f"Draft a short, professional follow-up email to {merchant['name']} asking to resolve these "
             f"discovery items before onboarding can proceed: {labels}. 3-4 sentences, plain text."

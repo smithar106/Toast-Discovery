@@ -76,6 +76,12 @@ STRUCTURED DISCOVERY STATE (confirmed / inferred / unknown)
 
 The LLM interprets ambiguity. Deterministic logic governs the process. The rep remains in control.
 
+**Model provider is pluggable.** The application talks to an OpenAI-compatible API and reads `DEEPSEEK_API_KEY` / `TOAST_LLM_MODEL` / `DEEPSEEK_BASE_URL` (DeepSeek is the provider selected for this prototype). Because the client is the standard OpenAI SDK pointed at a configurable base URL, swapping providers is a configuration change, not a code change. The architecture is model-agnostic:</p>
+
+```
+Python application → DeepSeek API → structured JSON output → deterministic validation
+```
+
 ```
 Toast-Discovery/
 ├── app.py                      # entry point
@@ -155,11 +161,13 @@ Covers the Route 9 and Riverbend walkthroughs, deterministic validation, the AI-
 Copy `.env.example` to `.env` and set a real key. Streamlit does not auto-load `.env`, so either export the variable before running:
 
 ```bash
-export OPENAI_API_KEY=sk-...
+export DEEPSEEK_API_KEY=sk-...
 streamlit run app.py
 ```
 
-When a key is present, the LLM powers contextual meeting guidance, meeting summaries, and extraction language. Without a key, equivalent rule-based fallbacks keep the demo fully functional. In both cases:
+DeepSeek is the default provider (model `deepseek-v4-flash`, base URL `https://api.deepseek.com`). To use a different OpenAI-compatible provider, set `AI_MODEL` and `AI_BASE_URL` (e.g. `AI_BASE_URL=https://api.openai.com/v1` with `AI_MODEL=gpt-4o-mini`), or set `OPENAI_API_KEY`.
+
+When a key is present, the LLM powers contextual meeting guidance, meeting summaries, and extraction. Without a key, equivalent rule-based fallbacks keep the demo fully functional. In both cases:
 
 - AI-generated facts are labeled **AI ASSISTED** and only count once the rep confirms them.
 - Critical requirements are satisfied by **rep/crm confirmed answers only** — never by unconfirmed AI output.
@@ -171,7 +179,7 @@ When a key is present, the LLM powers contextual meeting guidance, meeting summa
 1. Push this repository to GitHub.
 2. In Railway, **New Project → Deploy from GitHub repo** → select `Toast-Discovery`.
 3. Railway auto-detects the `Procfile` and `requirements.txt`. No extra build steps.
-4. Optional: add an `OPENAI_API_KEY` variable in the service's **Variables** tab (leave unset for offline mode).
+4. Optional: add an `AI_API_KEY` variable in the service's **Variables** tab (leave unset for offline mode).
 5. Railway assigns a public URL automatically.
 
 Start command (used by `Procfile`):
