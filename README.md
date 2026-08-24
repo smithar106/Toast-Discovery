@@ -25,28 +25,29 @@ Two ideas govern the architecture:
 
 | Capability | Where |
 | --- | --- |
-| Weekly merchant meeting agenda with critical-item counts | Sales Rep → This Week |
-| "Prepare for Meeting" — simulated agenda build | Sales Rep → merchant playbook |
+| Weekly merchant meeting agenda with critical-item counts | Sales → This Week |
+| "Prepare for Meeting" — simulated agenda build | Sales → merchant playbook |
 | What we already know (provenance + status badges) | Discovery agenda |
-| Focus for this meeting — contextual priorities | Discovery agenda |
+| Focus for this meeting — meeting objective + contextual priorities | Discovery agenda |
 | Governed requirements (deterministic) with source badges | Discovery agenda |
-| Vertical-specific discovery playbooks (5 verticals) | Sales Rep → merchant playbook |
+| Collapsible requirement sections (dropdowns) | Discovery playbook |
+| Vertical-specific discovery playbooks (5 verticals) | Sales → merchant playbook |
 | Conditional questions that react to earlier answers | Any playbook |
 | CRM-known info prepopulated, never re-entered | Playbook header |
 | "Before you leave" critical-gap blocking | Submission gate |
 | Critical-remaining as the primary rep metric (not %) | Playbook header + agenda |
 | Summarize & Extract — AI evidence → rep Confirm/Edit | Meeting analysis |
+| Confirm all extracted answers | Meeting analysis |
+| Meeting summary from unstructured context | Meeting analysis |
 | Unconfirmed AI output never satisfies critical requirements | Meeting analysis |
 | Incomplete meeting → Discovery gaps remain → onboarding blocked | Meeting analysis |
 | Draft Follow-Up for unresolved items | Meeting analysis |
 | Onboarding handoff with per-field provenance | Post-submit artifact |
 | "How this works" — AI vs deterministic boundary | Discovery agenda expander |
-| Executive KPIs, week-over-week trends, segmentation filters | Control Center |
-| Reactive KPIs — KPI row recomputes when you segment | Control Center |
-| Unresolved governed requirements, vertical & rep performance | Control Center |
-| Revenue Optimization Plan — top friction drivers, 3 interventions each, Director decision → draft project plan | Revenue Optimization |
 
 **Flagship demo:** *Route 9 Fuel & Grab.* The merchant is 90% there but **age verification was never discussed** — the exact failure that historically caused rework and escalation. The playbook makes the gap impossible to miss; after the meeting the rep runs **Summarize & Extract**, confirms the extracted age-verification answers, and deterministic validation flips discovery to complete — and the onboarding handoff explicitly carries the confirmed requirement.
+
+**Riverbend Grocery:** a second full path where one critical item (decision authority) is unresolved before the meeting; the prep guidance suggests a natural approach, and after the meeting extraction confirms Elena Boyd's authority → discovery completes.
 
 ---
 
@@ -77,7 +78,7 @@ The LLM interprets ambiguity. Deterministic logic governs the process. The rep r
 
 ```
 Toast-Discovery/
-├── app.py                      # entry point, sidebar role selector
+├── app.py                      # entry point
 ├── requirements.txt
 ├── Procfile                    # Railway start command
 ├── runtime.txt
@@ -85,22 +86,18 @@ Toast-Discovery/
 ├── .gitignore
 │
 ├── views/
-│   ├── sales_rep.py            # View 1
-│   ├── control_center.py       # View 2 (System Health + Revenue Optimization tabs)
-│   └── revenue_optimization.py # Director decision workspace
+│   └── sales_rep.py            # the Sales Rep experience
 │
 ├── components/
 │   ├── ui.py                   # shared visual system
-│   ├── merchant_card.py
-│   ├── discovery_form.py       # conditional widget rendering
-│   ├── metrics.py              # KPIs + Plotly charts
+│   ├── merchant_card.py        # agenda row
+│   ├── discovery_form.py       # collapsible governed requirement sections
 │   └── handoff.py              # handoff artifact renderer
 │
 ├── services/
 │   ├── __init__.py             # data loading
 │   ├── discovery_engine.py     # requirement assembly + conditions
 │   ├── validation.py           # deterministic completeness rules
-│   ├── optimization.py         # friction model + project plan generator (deterministic)
 │   ├── ai_service.py           # optional LLM + demo fallback
 │   └── handoff_service.py      # handoff generation
 │
@@ -109,14 +106,9 @@ Toast-Discovery/
 │   ├── crm_context.json        # known facts with provenance + certainty status
 │   ├── extractions.json        # mock AI extraction evidence + unresolved gaps
 │   ├── requirements.json       # governed requirements library (deterministic)
-│   ├── verticals.json          # vertical metadata
-│   ├── reps.json               # fictional sales reps
-│   ├── metrics.json            # KPI targets, insights, governance events
-│   ├── records.json            # generated mock operational records
-│   └── optimization.json       # friction drivers + intervention options
+│   └── verticals.json          # vertical metadata
 │
 ├── scripts/
-│   ├── generate_records.py     # deterministic mock record generator (data tool)
 │   └── run_tests.py            # smoke tests
 └── assets/
 ```
@@ -156,7 +148,7 @@ Open the printed URL. **No API key is required** — the app runs fully offline 
 python scripts/run_tests.py
 ```
 
-Covers the Route 9 walkthrough, deterministic validation, the AI-confirmation rule, handoff generation, Control Center segmentation reactivity, and the Revenue Optimization decision flow.
+Covers the Route 9 and Riverbend walkthroughs, deterministic validation, the AI-confirmation rule, handoff generation, and the blocked-onboarding path.
 
 ### Optional: enable LLM features
 
@@ -167,10 +159,10 @@ export OPENAI_API_KEY=sk-...
 streamlit run app.py
 ```
 
-When a key is present, the LLM powers contextual "what matters most" summaries and recording fact extraction. Without a key, equivalent rule-based fallbacks keep the demo fully functional. In both cases:
+When a key is present, the LLM powers contextual meeting guidance, meeting summaries, and extraction language. Without a key, equivalent rule-based fallbacks keep the demo fully functional. In both cases:
 
-- AI-generated facts are labeled **AI extracted** and only count once the rep confirms them.
-- Critical requirements are satisfied by **rep/crm answers only** — never by unconfirmed AI output.
+- AI-generated facts are labeled **AI ASSISTED** and only count once the rep confirms them.
+- Critical requirements are satisfied by **rep/crm confirmed answers only** — never by unconfirmed AI output.
 
 ---
 
@@ -192,28 +184,18 @@ streamlit run app.py --server.address=0.0.0.0 --server.port=$PORT --server.headl
 
 ---
 
-## Demo walkthrough (5–7 minutes)
+## Demo walkthrough
 
-1. **Sales Rep view** — see the "Discovery agenda": merchant rows with time, vertical, status, and **critical items to confirm**.
-2. **Open Route 9 Fuel & Grab.** The header reads "3 critical requirements remaining" — not a percentage.
-3. Review **Already Known (from CRM)** chips — decision maker, locations, fuel context.
-4. The **🔴 Before you leave** panel shows exactly which critical items remain; **Age verification is impossible to miss**.
-5. Answer the age-restricted question → **conditional questions appear** (product categories, today's method, POS enforcement).
-6. Add a **merchant note** and optionally **upload a recording** (simulated AI extraction, labeled, needs confirmation).
-7. The **Before you leave** panel clears and flips to **✓ Ready for handoff**.
-8. **Submit discovery** → Salesforce update, structured record saved, handoff generated, consultant notified.
-9. The **onboarding handoff** shows the confirmed age-verification requirement with provenance (CRM / Rep / AI).
-10. Switch to **RevOps → Control Center**.
-11. Read the **primary metric row** and the **Attention this week** panel (age verification, miss rate, recommended action).
-12. **Filter to Convenience + Fuel** — charts, tables, and the KPI row react.
-13. **Where requirements fail** shows age verification as the most commonly missed requirement.
-14. Open **Governed requirements** — see owners, versions, and rules; explain how leadership closes the loop.
-15. Switch to the **Revenue Optimization Plan** tab.
-16. See **Top Revenue Friction Drivers**; **Age Verification** ranks first.
-17. Open it → **Current state** (miss rate, delay, affected deals, modeled annual opportunity).
-18. Compare **three interventions** (prevent / predict / protect) with modeled impact + constraints.
-19. Select **Strengthen the Discovery Playbook** → review the **Proposed Optimization**.
-20. Click **Send Draft Project Plan via Email to Me** → simulated email, full project plan, and the decision appears in **Optimization Decisions**.
+1. See the **Discovery agenda** — merchant rows with time, vertical, status, and **critical items to confirm**. Green (complete) accounts need no intervention; red accounts carry unresolved critical discovery.
+2. **Open Route 9 Fuel & Grab** (red). The header reads "3 critical requirements remaining."
+3. **Prepare for Meeting** — see "What we already know" (with CONFIRMED / EXTRACTED / NEEDS CONFIRMATION badges), the **Meeting objective**, and **Focus for this meeting** contextual priorities.
+4. The **🔴 Critical requirements** section is a set of collapsible dropdowns. Age verification is impossible to miss.
+5. After the meeting, add notes/recording → **Summarize & Extract**.
+6. **Outstanding items before submission** — review the AI-extracted evidence, then **Confirm** (or Edit) each item, or **Confirm all**.
+7. Deterministic validation flips to **Discovery complete** → **Save & Send to Onboarding**.
+8. The **onboarding handoff** shows the confirmed requirement with provenance (CRM / Rep / AI).
+9. **Riverbend Grocery** demonstrates the prep guidance ("is there anyone else who needs to be involved…?") and the same extract → confirm → complete path.
+10. **Northline** demonstrates the blocked path: no extraction evidence for decision maker → **Discovery gaps remain** → **Draft Follow-Up**, onboarding disabled.
 
 ---
 
@@ -228,22 +210,22 @@ streamlit run app.py --server.address=0.0.0.0 --server.port=$PORT --server.headl
 7. Deterministic logic governs critical completeness (`validation.py`).
 8. AI facts never silently satisfy critical requirements (confirmed flag required).
 9. The rep sees exactly what remains before leaving ("Before you leave").
-10. The Director dashboard surfaces whether the system creates measurable value.
+10. The demo shows whether the system keeps reps focused on the deals where intervention changes the outcome.
 
 ---
 
 ## Prototype limitations
 
-- All data is **fictional mock data** (merchants, reps, metrics, records).
-- Recording upload stores/transcribes only in simulation; real transcription/extraction would plug into `ai_service.extract_facts_from_text`.
+- All data is **fictional mock data** (merchants, reps, CRM context, extraction evidence).
+- Recording upload stores/transcribes only in simulation; real transcription/extraction would plug into `ai_service`.
 - Submission writes to in-memory session state, not Salesforce.
-- Control Center records are pre-generated (`scripts/generate_records.py`); they are not fed by live rep submissions.
-- No auth — role is selected from the sidebar.
+- Extraction evidence is pre-authored mock data, not generated from real audio.
+- No auth.
 
 ## Production architecture considerations
 
 - Replace mock data modules with a real data layer (Salesforce sync, data warehouse, or backend API).
 - Move the requirements library into a versioned, governable config store with change control.
-- Persist discovery records to a database; make the Control Center read from the same source of truth as submission.
+- Persist discovery records to a database; make any analytics read from the same source of truth as submission.
 - Add real transcription (e.g., rev/deepgram) and pass transcripts through a structured fact-extraction pipeline with human confirmation.
-- Add auth/roles (rep vs. RevOps), audit logging for governance edits, and CI for the requirements library.
+- Add auth/roles, audit logging for requirement changes, and CI for the requirements library.

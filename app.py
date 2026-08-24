@@ -3,15 +3,15 @@
 Run locally:
     streamlit run app.py
 
-Two role-based experiences from one URL: Sales Rep (discovery agenda / playbooks)
-and RevOps Director (control center).
+Sales Rep experience: discovery agenda → prepare for meeting → discovery
+playbook → meeting analysis → handoff.
 """
 from __future__ import annotations
 
 import streamlit as st
 
 from components import ui
-from views import control_center, sales_rep
+from views import sales_rep
 
 st.set_page_config(
     page_title="Toast Retail Discovery",
@@ -24,8 +24,6 @@ ui.apply_theme()
 
 
 def _init_state() -> None:
-    if "role" not in st.session_state:
-        st.session_state["role"] = "Sales"
     if "rep_view" not in st.session_state:
         st.session_state["rep_view"] = "home"
 
@@ -43,26 +41,12 @@ def _sidebar() -> None:
             """,
             unsafe_allow_html=True,
         )
-        st.markdown('<div class="section-title">Workspace</div>', unsafe_allow_html=True)
-        role = st.radio(
-            "Workspace",
-            ["Sales", "RevOps"],
-            key="role",
-            label_visibility="collapsed",
-        )
         st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
-        if role == "Sales":
-            st.markdown(
-                f'<div class="chip chip-accent">Rep · Maya Chen</div><div style="height:0.4rem;"></div>'
-                f'<div class="faint small">Northeast</div>',
-                unsafe_allow_html=True,
-            )
-        else:
-            st.markdown(
-                f'<div class="chip chip-blue">RevOps Director</div><div style="height:0.4rem;"></div>'
-                f'<div class="faint small">System health</div>',
-                unsafe_allow_html=True,
-            )
+        st.markdown(
+            f'<div class="chip chip-accent">Rep · Maya Chen</div><div style="height:0.4rem;"></div>'
+            f'<div class="faint small">Northeast</div>',
+            unsafe_allow_html=True,
+        )
         st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
         st.markdown(
             '<div class="foot" style="margin-top:1rem;">Demo data is fictional and created for this case study.</div>',
@@ -73,11 +57,7 @@ def _sidebar() -> None:
 def main() -> None:
     _init_state()
     _sidebar()
-
-    if st.session_state["role"] == "Sales":
-        sales_rep.render()
-    else:
-        control_center.render()
+    sales_rep.render()
 
 
 if __name__ == "__main__":

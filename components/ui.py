@@ -12,8 +12,8 @@ ACCENT_SOFT = "#FBEFE9"     # washed accent
 INK = "#1A1D21"             # near-black text
 MUTED = "#1A1D21"           # secondary text (black — no grey in this UI)
 FAINT = "#1A1D21"           # tertiary text (black)
-BORDER = "#E4E6E8"          # hairline
-BORDER_STRONG = "#D4D7DA"
+BORDER = "#C9CDD3"          # card outline (clearly visible)
+BORDER_STRONG = "#A9AEB5"
 BG = "#F7F7F5"              # app background
 BG_SOFT = "#F2F2F0"
 CARD = "#FFFFFF"
@@ -93,9 +93,6 @@ def apply_theme() -> None:
         .agenda-arrow {{ color: {FAINT}; font-size: 1rem; }}
 
         /* ---- Playbook compact rows ---- */
-        .q-row {{ display: flex; align-items: center; gap: 0.9rem; padding: 0.5rem 1rem; }}
-        .q-row + .q-row {{ border-top: 1px solid #EFF0F1; }}
-        .q-text {{ flex: 1; min-width: 0; }}
         .q-label {{ font-size: 0.9rem; font-weight: 500; color: {INK}; }}
         .q-help {{ font-size: 0.75rem; color: {FAINT}; margin-top: 0.1rem; }}
 
@@ -111,30 +108,8 @@ def apply_theme() -> None:
 
         .status-dot {{ display: inline-block; width: 7px; height: 7px; border-radius: 50%; }}
 
-        /* ---- Critical panel ---- */
-        .critical-header {{ display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.6rem 1rem; background: {RED_SOFT}; border-bottom: 1px solid #F2D8D4; border-radius: 8px 8px 0 0; }}
-        .critical-title {{ font-size: 0.78rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: {RED}; }}
-        .important-header {{ display: flex; align-items: center; justify-content: space-between; padding: 0.55rem 1rem; background: {AMBER_SOFT}; border-bottom: 1px solid #EFE3C8; border-radius: 8px 8px 0 0; }}
-        .important-title {{ font-size: 0.78rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: {AMBER}; }}
-
-        /* ---- Insight / brief ---- */
-        .brief {{ background: {CARD}; border: 1px solid {BORDER}; border-left: 3px solid {ACCENT}; border-radius: 6px; padding: 0.65rem 0.85rem; }}
-        .brief-title {{ font-size: 0.72rem; font-weight: 650; letter-spacing: 0.06em; text-transform: uppercase; color: {MUTED}; margin-bottom: 0.15rem; }}
+        /* ---- Insight / note ---- */
         .attention {{ background: {CARD}; border: 1px solid {BORDER}; border-left: 3px solid {AMBER}; border-radius: 6px; padding: 0.65rem 0.85rem; }}
-        .attention-item {{ border-bottom: 1px solid #EFF0F1; padding: 0.45rem 0; }}
-        .attention-item:last-child {{ border-bottom: none; padding-bottom: 0; }}
-        .attention-item:first-child {{ padding-top: 0; }}
-
-        /* ---- Metrics / KPI ---- */
-        .kpi-grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 0.6rem; }}
-        .kpi-card {{ background: {CARD}; border: 1px solid {BORDER}; border-radius: 8px; padding: 0.7rem 0.85rem; }}
-        .kpi-card .kpi-label {{ font-size: 0.68rem; letter-spacing: 0.07em; text-transform: uppercase; color: {FAINT}; font-weight: 600; }}
-        .kpi-card .kpi-value {{ font-size: 1.5rem; font-weight: 650; letter-spacing: -0.02em; color: {INK}; line-height: 1.15; }}
-        .kpi-card .kpi-sub {{ font-size: 0.72rem; color: {FAINT}; margin-top: 0.05rem; }}
-        .kpi {{ background: {CARD}; border: 1px solid {BORDER}; border-radius: 8px; padding: 0.7rem 0.85rem; }}
-        .kpi-label {{ font-size: 0.68rem; letter-spacing: 0.07em; text-transform: uppercase; color: {FAINT}; font-weight: 600; }}
-        .kpi-value {{ font-size: 1.5rem; font-weight: 650; letter-spacing: -0.02em; color: {INK}; line-height: 1.15; }}
-        .kpi-sub {{ font-size: 0.72rem; color: {FAINT}; margin-top: 0.05rem; }}
 
         /* ---- Misc ---- */
         .note {{ background: {ACCENT_SOFT}; border-left: 3px solid {ACCENT}; border-radius: 6px; padding: 0.6rem 0.85rem; font-size: 0.85rem; color: #7A3A1E; }}
@@ -191,8 +166,22 @@ def apply_theme() -> None:
         }}
 
         /* expanders */
-        [data-testid="stExpander"] {{ border: 1px solid {BORDER}; border-radius: 6px; }}
-        [data-testid="stExpander"] summary {{ font-size: 0.85rem; }}
+        [data-testid="stExpander"] {{
+            background: {CARD};
+            border: 1px solid {BORDER};
+            border-radius: 8px;
+            margin-bottom: 0.4rem;
+        }}
+        [data-testid="stExpander"] summary {{
+            font-size: 0.88rem;
+            font-weight: 550;
+            color: {INK};
+        }}
+        [data-testid="stExpander"] summary:hover {{ background: #FAFAF9; }}
+        [data-testid="stExpander"] [data-testid="stExpanderDetails"] {{
+            border-top: 1px solid {BORDER};
+        }}
+        [data-testid="stExpander"] [data-testid="stVerticalBlock"] {{ padding: 0.5rem 0.9rem; }}
 
         /* file uploader */
         [data-testid="stFileUploaderDropzone"] {{

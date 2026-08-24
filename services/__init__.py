@@ -25,18 +25,6 @@ def load_merchants() -> list[dict]:
     return _load("merchants.json")["merchants"]
 
 
-def load_reps() -> list[dict]:
-    return _load("reps.json")["reps"]
-
-
-def load_metrics() -> dict:
-    return _load("metrics.json")
-
-
-def load_records() -> list[dict]:
-    return _load("records.json")["records"]
-
-
 def load_crm_context() -> dict:
     return _load("crm_context.json")["crm_context"]
 

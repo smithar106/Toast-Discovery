@@ -1,9 +1,9 @@
 """Interactive discovery form with conditional requirements.
 
-Compact single-panel design: requirements render as tight rows (label left,
-widget right) inside one Critical panel and one quieter Important panel. The
-panel header carries the "before you leave" count so the rep sees the minimum
-sufficient discovery state at a glance.
+Each governed requirement renders inside a collapsible dropdown (expander) so
+the playbook reads as tidy sections instead of a long flat list. The expander
+title carries the question + a status chip; opening it reveals the help text and
+the answer widget. Confirmed answers collapse by default.
 
 Confirmed answers render as read-only rows (with a CONFIRMED chip) rather than
 live widgets — the rep is never asked to re-enter information already captured.
@@ -39,6 +39,19 @@ def _label(req_id: str) -> str:
         if r["id"] == req_id:
             return r["label"]
     return req_id
+
+
+def _source_chips(entry: dict | None) -> str:
+    if not entry:
+        return ""
+    src = entry.get("source")
+    if src == "crm":
+        return ui.chip("GOVERNED · from CRM", "blue")
+    if src == "ai":
+        if entry.get("confirmed"):
+            return ui.chip("AI ASSISTED · confirmed", "accent")
+        return ui.chip("AI ASSISTED · needs confirm", "accent")
+    return ui.chip("CONFIRMED", "green")
 
 
 def _render_widget(merchant_id: str, req: dict, entry: dict | None, existing_value):
@@ -121,121 +134,101 @@ def _finalize(answers: dict, req_id: str, value, entry: dict | None, changed: bo
     answers[req_id] = {"value": value, "source": new_source, "confirmed": confirmed}
 
 
+def _section_header(label: str, sub: str, tone: str) -> None:
+    bg = {"red": "#FDF6F5", "amber": "#FAF3E3"}[tone]
+    border = {"red": "#F2D8D4", "amber": "#EFE3C8"}[tone]
+    color = {"red": ui.RED, "amber": ui.AMBER}[tone]
+    st.markdown(
+        f'<div class="panel" style="margin-bottom:0.6rem; padding:0.7rem 1rem; border-left:3px solid {color}; background:{bg};">'
+        f'<div style="display:flex; justify-content:space-between; align-items:center; gap:0.75rem; flex-wrap:wrap;">'
+        f'<span style="font-size:0.85rem; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; color:{color};">{label}</span>'
+        f'<span style="font-size:0.82rem; color:{ui.INK};">{sub}</span>'
+        f'</div></div>',
+        unsafe_allow_html=True,
+    )
+
+
 def render_discovery_form(merchant: dict, answers: dict, evaluation: dict) -> dict:
-    """Render compact Critical + Important panels; returns updated answers."""
+    """Render Critical + Important sections as collapsible dropdowns."""
     vertical = merchant["vertical"]
     merchant_id = merchant["id"]
     critical, important, _ = grouped_requirements(vertical, answers)
 
     n_missing = len(evaluation["critical_missing"])
-    missing_labels = " · ".join(f'<span style="color:{ui.INK};">{r["label"]}</span>' for r in evaluation["critical_missing"])
-    if n_missing:
-        header_label = f"🔴 Before you leave · {n_missing} remaining"
-        header_sub = f'<span style="font-weight:500; color:{ui.RED}; text-transform:none; letter-spacing:0; font-size:0.8rem;">{missing_labels}</span>'
-    else:
-        header_label = "🔴 Critical requirements · complete"
-        header_sub = '<span class="chip chip-green">✓ Ready for handoff</span>'
 
-    st.markdown(
-        f'<div class="panel-flush" style="margin-bottom:1rem;">'
-        f'<div class="critical-header"><span class="critical-title">{header_label}</span>{header_sub}</div>',
-        unsafe_allow_html=True,
-    )
+    # ---- Critical requirements section ----
+    if n_missing:
+        labels = ", ".join(r["label"] for r in evaluation["critical_missing"])
+        _section_header(
+            "🔴 Critical requirements · before you leave",
+            f"{n_missing} remaining — {labels}",
+            "red",
+        )
+    else:
+        _section_header(
+            "🔴 Critical requirements · complete",
+            "✓ Ready for handoff — all governed requirements confirmed",
+            "red",
+        )
 
     for req in critical:
         entry = _existing(answers, req["id"])
-        source_chips = ""
-        if entry:
-            src = entry.get("source")
-            if src == "crm":
-                source_chips = ui.chip("GOVERNED · from CRM", "blue")
-            elif src == "ai":
-                source_chips = ui.chip("AI ASSISTED · needs confirm" if not entry.get("confirmed") else "AI ASSISTED · confirmed", "accent")
-            else:
-                source_chips = ui.chip("CONFIRMED", "green")
+        is_confirmed = bool(entry and entry.get("confirmed"))
+        chips = _source_chips(entry)
         parent = req.get("condition", {}).get("field")
         child = f'<span class="q-help">after “{_label(parent)}”</span>' if parent else ""
 
-        is_confirmed = bool(entry and entry.get("confirmed"))
         if is_confirmed:
-            st.markdown(
-                f'<div style="padding:0.5rem 1rem;">'
-                f'<div style="display:flex; justify-content:space-between; align-items:center; gap:0.6rem;">'
-                f'<span style="flex:1; min-width:0;"><span class="q-label">✓ {req["question"]}</span> '
-                f'<span class="faint small">{child}</span></span>'
-                f'<span style="display:flex; gap:0.3rem; align-items:center; flex-shrink:0;">'
-                f'<span class="small" style="font-weight:550; color:{ui.INK};">{_format_value(entry.get("value"))}</span>{source_chips}</span>'
-                f'</div></div>',
-                unsafe_allow_html=True,
-            )
-            if req is not critical[-1]:
-                st.markdown('<div style="border-top:1px solid #EFF0F1; margin:0 1rem;"></div>', unsafe_allow_html=True)
+            # collapsed read-only row
+            title = f"✓ {req['question']} — {_format_value(entry.get('value'))}"
+            with st.expander(title, expanded=False):
+                st.markdown(
+                    f'<div class="small" style="color:{ui.INK};">{child} {chips} '
+                    f'<span class="faint small">{req.get("help", "")}</span></div>',
+                    unsafe_allow_html=True,
+                )
             continue
 
-        c1, c2 = st.columns([3.2, 2.4], gap="small")
-        with c1:
-            st.markdown(
-                f'<div style="padding:0.45rem 0.25rem 0.45rem 1rem;"><span class="q-label">{req["question"]}</span>'
-                f'<div style="display:flex; gap:0.3rem; margin-top:0.15rem;">{child}{source_chips}</div></div>',
-                unsafe_allow_html=True,
-            )
-        with c2:
+        title = f"{req['question']} {chips}"
+        with st.expander(title, expanded=True):
+            if req.get("help"):
+                st.markdown(
+                    f'<div class="small" style="color:{ui.INK}; margin-bottom:0.4rem;">{child} '
+                    f'<span class="faint small">{req["help"]}</span></div>',
+                    unsafe_allow_html=True,
+                )
             value, changed = _render_widget(merchant_id, req, entry, None)
             _finalize(answers, req["id"], value, entry, changed)
-        if req is not critical[-1]:
-            st.markdown('<div style="border-top:1px solid #EFF0F1; margin:0 1rem;"></div>', unsafe_allow_html=True)
 
-    st.markdown("</div>", unsafe_allow_html=True)
-
+    # ---- Important / conditional section ----
     if important:
-        st.markdown(
-            f'<div class="panel-flush" style="margin-bottom:1rem;">'
-            f'<div class="important-header"><span class="important-title">🟡 If time allows</span></div>',
-            unsafe_allow_html=True,
-        )
+        _section_header("🟡 If time allows", "Important or conditional — not required to complete", "amber")
         for req in important:
             entry = _existing(answers, req["id"])
-            source_chips = ""
-            if entry:
-                src = entry.get("source")
-                if src == "crm":
-                    source_chips = ui.chip("GOVERNED · from CRM", "blue")
-                elif src == "ai":
-                    source_chips = ui.chip("AI ASSISTED · needs confirm" if not entry.get("confirmed") else "AI ASSISTED · confirmed", "accent")
-                else:
-                    source_chips = ui.chip("CONFIRMED", "green")
+            is_confirmed = bool(entry and entry.get("confirmed"))
+            chips = _source_chips(entry)
             parent = req.get("condition", {}).get("field")
             child = f'<span class="q-help">after “{_label(parent)}”</span>' if parent else ""
 
-            is_confirmed = bool(entry and entry.get("confirmed"))
             if is_confirmed:
-                st.markdown(
-                    f'<div style="padding:0.5rem 1rem;">'
-                    f'<div style="display:flex; justify-content:space-between; align-items:center; gap:0.6rem;">'
-                    f'<span style="flex:1; min-width:0;"><span class="q-label" style="color:{ui.MUTED};">✓ {req["question"]}</span> '
-                    f'<span class="faint small">{child}</span></span>'
-                    f'<span style="display:flex; gap:0.3rem; align-items:center; flex-shrink:0;">'
-                    f'<span class="small" style="font-weight:550; color:{ui.INK};">{_format_value(entry.get("value"))}</span>{source_chips}</span>'
-                    f'</div></div>',
-                    unsafe_allow_html=True,
-                )
-                if req is not important[-1]:
-                    st.markdown('<div style="border-top:1px solid #EFF0F1; margin:0 1rem;"></div>', unsafe_allow_html=True)
+                title = f"✓ {req['question']} — {_format_value(entry.get('value'))}"
+                with st.expander(title, expanded=False):
+                    st.markdown(
+                        f'<div class="small" style="color:{ui.INK};">{child} {chips} '
+                        f'<span class="faint small">{req.get("help", "")}</span></div>',
+                        unsafe_allow_html=True,
+                    )
                 continue
 
-            c1, c2 = st.columns([3.2, 2.4], gap="small")
-            with c1:
-                st.markdown(
-                    f'<div style="padding:0.42rem 0.25rem 0.42rem 1rem;"><span class="q-label" style="color:{ui.MUTED};">{req["question"]}</span>'
-                    f'<div style="display:flex; gap:0.3rem; margin-top:0.15rem;">{child}{source_chips}</div></div>',
-                    unsafe_allow_html=True,
-                )
-            with c2:
+            title = f"{req['question']} {chips}"
+            with st.expander(title, expanded=False):
+                if req.get("help"):
+                    st.markdown(
+                        f'<div class="small" style="color:{ui.INK}; margin-bottom:0.4rem;">{child} '
+                        f'<span class="faint small">{req["help"]}</span></div>',
+                        unsafe_allow_html=True,
+                    )
                 value, changed = _render_widget(merchant_id, req, entry, None)
                 _finalize(answers, req["id"], value, entry, changed)
-            if req is not important[-1]:
-                st.markdown('<div style="border-top:1px solid #EFF0F1; margin:0 1rem;"></div>', unsafe_allow_html=True)
-
-        st.markdown("</div>", unsafe_allow_html=True)
 
     return answers
