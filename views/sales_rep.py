@@ -237,7 +237,7 @@ def _render_what_we_know(merchant: dict) -> None:
 
 
 def _render_focus(merchant: dict, answers: dict, evaluation: dict) -> None:
-    priorities = ai_service.meeting_focus(merchant, answers, evaluation["critical_missing"])
+    focus = ai_service.meeting_focus(merchant, answers, evaluation["critical_missing"])
     st.markdown(
         '<div class="section-title" style="margin-top:0.9rem;">Focus for this meeting</div>',
         unsafe_allow_html=True,
@@ -247,7 +247,17 @@ def _render_focus(merchant: dict, answers: dict, evaluation: dict) -> None:
         'unresolved, here are the areas worth focusing on today.</div>',
         unsafe_allow_html=True,
     )
-    for pri in priorities:
+
+    # Meeting objective
+    st.markdown(
+        f'<div class="panel" style="margin-bottom:0.5rem; padding:0.7rem 1rem;">'
+        f'<div class="faint small" style="font-size:0.7rem; letter-spacing:0.07em; text-transform:uppercase; font-weight:600;">Meeting objective</div>'
+        f'<div style="font-size:0.93rem; color:{ui.INK}; margin-top:0.15rem;">{focus["objective"]}</div>'
+        f'</div>',
+        unsafe_allow_html=True,
+    )
+
+    for pri in focus["priorities"]:
         st.markdown(
             f"""
             <div class="panel" style="margin-bottom:0.5rem; padding:0.75rem 1rem;">
@@ -255,14 +265,15 @@ def _render_focus(merchant: dict, answers: dict, evaluation: dict) -> None:
                     <span style="font-weight:650; color:{ui.RED}; font-size:0.95rem;">🔴 {pri['requirement']}</span>
                     <span class="chip chip-accent">AI ASSISTED</span>
                 </div>
-                <div class="small" style="margin-top:0.4rem;"><b>What we know:</b> {pri['what_we_know']}</div>
+                <div class="small" style="margin-top:0.4rem;"><b>What we already know:</b> {pri['what_we_know']}</div>
+                <div class="small" style="margin-top:0.2rem;"><b>Priority for this conversation:</b> {pri['requirement']}</div>
                 <div class="small" style="margin-top:0.2rem;"><b>Suggested approach:</b> {pri['suggested_approach']}</div>
                 <div class="small muted" style="margin-top:0.2rem;"><b>Why this matters:</b> {pri['why_it_matters']}</div>
             </div>
             """,
             unsafe_allow_html=True,
         )
-    if not priorities:
+    if not focus["priorities"]:
         st.markdown(
             '<div class="small muted" style="margin-bottom:0.6rem;">All critical requirements are confirmed. '
             'Use the meeting for important context and timeline confirmation.</div>',
@@ -352,6 +363,15 @@ def _render_meeting_analysis(merchant: dict, answers: dict, notes_key: str, eval
         unsafe_allow_html=True,
     )
 
+    if analysis.get("summary"):
+        st.markdown(
+            f'<div class="panel" style="margin-bottom:0.6rem; padding:0.7rem 1rem;">'
+            f'<div class="faint small" style="font-size:0.7rem; letter-spacing:0.07em; text-transform:uppercase; font-weight:600;">Meeting summary</div>'
+            f'<div style="font-size:0.9rem; color:{ui.INK}; margin-top:0.15rem;">{analysis["summary"]}</div>'
+            f'</div>',
+            unsafe_allow_html=True,
+        )
+
     if analysis["extractions"]:
         for item in analysis["extractions"]:
             _render_extraction_item(merchant, answers, item)
@@ -361,6 +381,18 @@ def _render_meeting_analysis(merchant: dict, answers: dict, notes_key: str, eval
             'provided context.</div>',
             unsafe_allow_html=True,
         )
+
+    # Confirm-all shortcut when extractions exist but some are unconfirmed
+    pending = [i for i in analysis["extractions"] if not (answers.get(i["req_id"]) or {}).get("confirmed")]
+    if pending:
+        if st.button("Confirm all extracted answers", width="stretch", type="primary",
+                     key=f"confirm_all_{merchant['id']}"):
+            for item in analysis["extractions"]:
+                answers[item["req_id"]] = {
+                    "value": item["suggested_value"],
+                    "source": "ai",
+                    "confirmed": True,
+                }
 
     # Deterministic validation after confirmation
     evaluation = evaluate_merchant(merchant, answers)

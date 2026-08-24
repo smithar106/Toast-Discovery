@@ -45,37 +45,43 @@
     },
     "riverbend": {
       "meeting": "Riverbend Grocery \u00b7 Aug 24, 1:30 PM \u00b7 Phone",
-      "source": "Call recording + rep notes",
+      "source": "Call recording + handwritten notes",
+      "summary": "Riverbend is evaluating Toast as a replacement for several disconnected systems. Elena Boyd confirmed that she has final purchasing authority, with her husband reviewing the proposal but not providing separate approval. The merchant is targeting an early-November launch and confirmed requirements around EBT, loyalty, weighted items, and inventory management.",
       "extractions": [
         {
-          "req_id": "inventory_workflows",
-          "label": "Inventory workflows",
-          "suggested_value": "Approximately 4,200 active SKUs",
-          "evidence": "\"We have a little over four thousand active products.\"",
-          "source_note": "Recording \u00b7 03:28",
+          "req_id": "decision_maker",
+          "label": "Decision maker",
+          "suggested_value": "Elena Boyd \u2014 confirmed",
+          "evidence": "\u201cthis is really my decision\u201d",
+          "source_note": "Handwritten notes \u00b7 page 1",
+          "confidence": "high"
+        },
+        {
+          "req_id": "ebt_implementation",
+          "label": "EBT implementation approach",
+          "suggested_value": "Integrated EBT (SNAP + cash)",
+          "evidence": "\u201cEBT \u2014 YES, important, needs to work with cash too\u201d",
+          "source_note": "Handwritten notes \u00b7 page 1",
+          "confidence": "high"
+        },
+        {
+          "req_id": "scale_vendor",
+          "label": "Scale vendor / model",
+          "suggested_value": "Mettler Toledo",
+          "evidence": "\u201cdeli + produce run on Mettler\u201d",
+          "source_note": "Handwritten notes \u00b7 page 2",
           "confidence": "medium"
         },
         {
           "req_id": "timeline",
           "label": "Target timeline",
-          "suggested_value": "October",
-          "evidence": "\"We'd like everything running before the holiday season.\"",
-          "source_note": "Recording \u00b7 12:02",
+          "suggested_value": "Early November",
+          "evidence": "\u201cbefore holiday rush\u201d",
+          "source_note": "Handwritten notes \u00b7 page 2",
           "confidence": "medium"
         }
       ],
-      "gaps": [
-        {
-          "req_id": "decision_maker",
-          "label": "Decision authority",
-          "reason": "Elena Boyd participated in the call, but final purchasing authority was not established."
-        },
-        {
-          "req_id": "ebt_implementation",
-          "label": "EBT implementation approach",
-          "reason": "EBT was mentioned but the integrated-vs-terminal approach was not discussed."
-        }
-      ]
+      "gaps": []
     },
     "cornermart": {
       "meeting": "CornerMart \u00b7 Aug 25, 9:00 AM \u00b7 In-person",

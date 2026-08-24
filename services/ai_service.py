@@ -211,12 +211,14 @@ def _requirement_meta(req_id: str) -> dict:
     return {"id": req_id, "label": req_id, "rule": "", "question": ""}
 
 
-def meeting_focus(merchant: dict, answers: dict, critical_missing: list[dict]) -> list[dict]:
-    """Build 1-3 contextual priorities for this merchant's meeting.
+def meeting_focus(merchant: dict, answers: dict, critical_missing: list[dict]) -> dict:
+    """Build the contextual 'focus for this meeting' block for a merchant.
 
-    The governed requirement is deterministic; what we know, the suggested
-    approach, and why it matters are the LLM contextualizing it for THIS merchant.
-    Deterministic fallback is used when no API key is present.
+    Returns a dict with:
+      - objective: 1-2 sentence meeting objective grounded in remaining criticals
+      - priorities: 1-3 items, each with what_we_know / suggested_approach / why_it_matters
+    The governed requirement is deterministic; the guidance is the LLM contextualizing
+    it for THIS merchant. Deterministic fallback is used when no API key is present.
     """
     priorities = []
     for req in critical_missing[:3]:
@@ -225,35 +227,63 @@ def meeting_focus(merchant: dict, answers: dict, critical_missing: list[dict]) -
             "req_id": req["id"],
             "requirement": meta.get("label", req["id"]),
             "what_we_know": _focus_what_we_know(merchant, req["id"]),
-            "suggested_approach": _focus_approach(meta, merchant),
+            "suggested_approach": _focus_approach(meta, merchant, req["id"]),
             "why_it_matters": meta.get("rule", "Required for a complete sales-to-onboarding handoff."),
         })
+
+    n_missing = len(critical_missing)
+    if n_missing == 1:
+        objective = (
+            f"Leave the call with enough information to complete the discovery handoff. "
+            f"One critical requirement remains unresolved: {critical_missing[0]['label']}."
+        )
+    elif n_missing:
+        labels = ", ".join(r["label"] for r in critical_missing)
+        objective = (
+            f"Leave the call with enough information to complete the discovery handoff. "
+            f"{n_missing} critical requirements remain unresolved: {labels}."
+        )
+    else:
+        objective = (
+            "All critical requirements are already confirmed. Use the meeting to confirm "
+            "important context and the target timeline."
+        )
 
     if OPENAI_KEY and priorities:
         req_text = "; ".join(p["requirement"] for p in priorities)
         known_text = "; ".join(f"{k}: {v.get('value')}" for k, v in merchant.get("known", {}).items())
         prompt = (
-            f"For merchant {merchant['name']} ({merchant['vertical']}), produce a JSON list of up to 3 priorities "
-            f"for a discovery meeting, one per unresolved requirement: {req_text}. Known context: {known_text}. "
-            f"Each item: {{'requirement','what_we_know','suggested_approach','why_it_matters'}}. "
-            f"Suggested approaches are direct questions the rep can ask the merchant. Plain JSON array only."
+            f"For merchant {merchant['name']} ({merchant['vertical']}), produce JSON: "
+            f"{{'objective': 'one sentence', 'priorities': [{{'requirement','what_we_know',"
+            f"'suggested_approach','why_it_matters'}}]}} for a discovery meeting. Unresolved requirements: "
+            f"{req_text}. Known context: {known_text}. Suggested approaches are natural, direct questions the "
+            f"rep can ask the merchant. Plain JSON only."
         )
         out = _chat([{"role": "user", "content": prompt}])
         if out:
             try:
-                start, end = out.find("["), out.rfind("]") + 1
+                start, end = out.find("{"), out.rfind("}") + 1
                 data = json.loads(out[start:end])
-                if isinstance(data, list) and data:
-                    return data[:3]
+                if isinstance(data, dict) and data.get("priorities"):
+                    return {
+                        "objective": data.get("objective", objective),
+                        "priorities": data["priorities"][:3],
+                    }
             except Exception:
                 pass
-    return priorities
+    return {"objective": objective, "priorities": priorities}
 
 
 def _focus_what_we_know(merchant: dict, req_id: str) -> str:
+    from services import load_crm_context
     known = merchant.get("known", {})
+    ctx = load_crm_context().get(merchant["id"], {}).get("facts", [])
     if req_id == "decision_maker":
         dm = merchant.get("decision_maker") or {}
+        # use crm_context facts about decision authority if available
+        for f in ctx:
+            if "decision" in f["label"].lower():
+                return f"{f['value']}. Listed as co-owner; final purchasing authority is not yet confirmed."
         if dm.get("name"):
             return (f"{dm['name']} is the primary contact, but it is not confirmed "
                     "they hold final purchasing authority alone.")
@@ -262,7 +292,18 @@ def _focus_what_we_know(merchant: dict, req_id: str) -> str:
     return "No confirmed information on record yet."
 
 
-def _focus_approach(meta: dict, merchant: dict) -> str:
+def _focus_approach(meta: dict, merchant: dict, req_id: str = "") -> str:
+    from services import load_crm_context
+    ctx = load_crm_context().get(merchant["id"], {}).get("facts", [])
+    if req_id == "decision_maker":
+        dm = merchant.get("decision_maker") or {}
+        if dm.get("name"):
+            return (
+                f"{dm['name']} appears to be driving the evaluation, so avoid asking generically who the "
+                f"decision maker is. Instead confirm the process naturally: \u201cIf we land on the right "
+                f"configuration today, is there anyone else who needs to be involved before you can move "
+                f"forward?\u201d"
+            )
     q = meta.get("question", "")
     if q:
         return f"Ask: \u201c{q}\u201d"

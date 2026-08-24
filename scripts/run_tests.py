@@ -124,7 +124,31 @@ def test_route9_ui_walkthrough():
 
 
 def test_incomplete_post_meeting():
-    # Riverbend: extraction leaves decision authority unresolved -> onboarding blocked
+    # Northline: no extraction evidence resolves decision maker -> onboarding blocked
+    at = stt.AppTest.from_file("app.py", default_timeout=30)
+    at.run()
+    for b in at.button:
+        if b.key == "open_northline":
+            b.click()
+            break
+    at.run()
+    [b for b in at.button if b.label == "Prepare for Meeting"][0].click().run()
+    [x for x in at.text_area if x.key == "notes_northline"][0].set_value(
+        "Met with the GM; the CEO was referenced but did not join.").run()
+    at.run()
+    [b for b in at.button if b.label == "Summarize & Extract"][0].click().run()
+    assert not at.exception
+    md = " ".join(m.value for m in at.markdown)
+    assert "Discovery gaps remain" in md
+    assert "Decision maker" in md
+    send = [b for b in at.button if b.label == "Send to Onboarding"]
+    assert send and send[0].disabled, "onboarding must be blocked when criticals unresolved"
+    assert any(b.label == "Draft Follow-Up" for b in at.button)
+    print("  ui: incomplete meeting -> gaps remain -> onboarding blocked = True")
+
+
+def test_riverbend_prep_to_complete():
+    # Riverbend: prepare -> objective/priority guidance -> extract -> confirm all -> complete
     at = stt.AppTest.from_file("app.py", default_timeout=30)
     at.run()
     for b in at.button:
@@ -133,18 +157,30 @@ def test_incomplete_post_meeting():
             break
     at.run()
     [b for b in at.button if b.label == "Prepare for Meeting"][0].click().run()
+    assert not at.exception
+    md = " ".join(m.value for m in at.markdown)
+    assert "Meeting objective" in md
+    assert "decision authority" in md.lower() or "Decision maker" in md
+    assert "Suggested approach" in md
+    print("  ui: riverbend prep shows objective + contextual priority = True")
+
     [x for x in at.text_area if x.key == "notes_riverbend"][0].set_value(
-        "Elena joined the call and we discussed consolidation.").run()
+        "Elena confirmed final authority; husband reviews only.").run()
     at.run()
     [b for b in at.button if b.label == "Summarize & Extract"][0].click().run()
     assert not at.exception
     md = " ".join(m.value for m in at.markdown)
-    assert "Discovery gaps remain" in md
-    assert "Decision authority" in md
-    send = [b for b in at.button if b.label == "Send to Onboarding"]
-    assert send and send[0].disabled, "onboarding must be blocked when criticals unresolved"
-    assert any(b.label == "Draft Follow-Up" for b in at.button)
-    print("  ui: incomplete meeting -> gaps remain -> onboarding blocked = True")
+    assert "Meeting summary" in md
+    assert "this is really my decision" in md
+    # Confirm all
+    confirm_all = [b for b in at.button if b.label == "Confirm all extracted answers"]
+    if confirm_all:
+        confirm_all[0].click().run()
+        assert not at.exception
+    md = " ".join(m.value for m in at.markdown)
+    assert "Discovery complete" in md, "riverbend should complete after decision maker confirmed"
+    assert any(b.label == "Save & Send to Onboarding" for b in at.button)
+    print("  ui: riverbend extract + confirm -> complete = True")
 
 
 def test_control_center():
@@ -212,7 +248,7 @@ def test_revenue_optimization_flow():
 if __name__ == "__main__":
     tests = [test_deterministic_validation, test_ai_facts_need_confirmation,
              test_handoff_includes_age_verification, test_route9_ui_walkthrough,
-             test_incomplete_post_meeting,
+             test_incomplete_post_meeting, test_riverbend_prep_to_complete,
              test_control_center, test_revenue_optimization_flow]
     for t in tests:
         t()
