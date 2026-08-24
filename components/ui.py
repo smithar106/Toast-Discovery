@@ -53,8 +53,8 @@ def apply_theme() -> None:
         html, body, [class*="css"], [data-testid="stAppViewContainer"] {{
             font-family: 'Inter', -apple-system, system-ui, sans-serif;
             color: {INK};
-            font-size: 14px;
-            line-height: 1.45;
+            font-size: 15px;
+            line-height: 1.5;
         }}
         [data-testid="stAppViewContainer"] {{ background: {BG}; }}
         [data-testid="stAppViewBlockContainer"] {{ padding-top: 1.25rem; padding-bottom: 3rem; }}
@@ -68,15 +68,15 @@ def apply_theme() -> None:
         .block-container {{ max-width: 1180px; }}
 
         /* ---- Typography ---- */
-        h1 {{ font-size: 1.55rem; font-weight: 650; letter-spacing: -0.02em; color: {INK}; margin-bottom: 0.1rem; }}
-        h2 {{ font-size: 1.15rem; font-weight: 600; letter-spacing: -0.01em; color: {INK}; }}
-        h3 {{ font-size: 1rem; font-weight: 600; color: {INK}; }}
+        h1 {{ font-size: 1.8rem; font-weight: 650; letter-spacing: -0.02em; color: {INK}; margin-bottom: 0.1rem; }}
+        h2 {{ font-size: 1.3rem; font-weight: 600; letter-spacing: -0.01em; color: {INK}; }}
+        h3 {{ font-size: 1.1rem; font-weight: 600; color: {INK}; }}
         p {{ margin-bottom: 0.25rem; }}
-        .eyebrow {{ font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; color: {FAINT}; font-weight: 600; margin-bottom: 0.15rem; }}
+        .eyebrow {{ font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase; color: {FAINT}; font-weight: 600; margin-bottom: 0.15rem; }}
         .muted {{ color: {MUTED}; }}
         .faint {{ color: {FAINT}; }}
-        .small {{ font-size: 0.82rem; }}
-        .section-title {{ font-size: 0.78rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: {INK}; margin: 0 0 0.4rem 0; }}
+        .small {{ font-size: 0.9rem; }}
+        .section-title {{ font-size: 0.88rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: {INK}; margin: 0 0 0.4rem 0; }}
         .divider {{ border-top: 1px solid {BORDER}; margin: 1rem 0; }}
 
         /* ---- Panels (typography-led, minimal borders) ---- */
@@ -87,17 +87,17 @@ def apply_theme() -> None:
         .row:hover {{ background: #FAFAF9; }}
 
         /* ---- Agenda rows ---- */
-        .agenda-time {{ font-size: 0.95rem; font-weight: 600; color: {INK}; min-width: 58px; white-space: nowrap; }}
-        .agenda-name {{ font-weight: 600; font-size: 0.95rem; color: {INK}; }}
-        .agenda-meta {{ font-size: 0.78rem; color: {MUTED}; }}
-        .agenda-arrow {{ color: {FAINT}; font-size: 1rem; }}
+        .agenda-time {{ font-size: 1.1rem; font-weight: 600; color: {INK}; min-width: 58px; white-space: nowrap; }}
+        .agenda-name {{ font-weight: 600; font-size: 1.1rem; color: {INK}; }}
+        .agenda-meta {{ font-size: 0.92rem; color: {MUTED}; }}
+        .agenda-arrow {{ color: {FAINT}; font-size: 1.2rem; }}
 
         /* ---- Playbook compact rows ---- */
-        .q-label {{ font-size: 0.9rem; font-weight: 500; color: {INK}; }}
-        .q-help {{ font-size: 0.75rem; color: {FAINT}; margin-top: 0.1rem; }}
+        .q-label {{ font-size: 1rem; font-weight: 500; color: {INK}; }}
+        .q-help {{ font-size: 0.85rem; color: {FAINT}; margin-top: 0.1rem; }}
 
         /* ---- Status chips (restrained) ---- */
-        .chip {{ display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.12rem 0.5rem; border-radius: 4px; font-size: 0.72rem; font-weight: 550; letter-spacing: 0.01em; white-space: nowrap; }}
+        .chip {{ display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.16rem 0.6rem; border-radius: 4px; font-size: 0.8rem; font-weight: 550; letter-spacing: 0.01em; white-space: nowrap; }}
         .chip-neutral {{ background: {BG_SOFT}; color: {MUTED}; border: 1px solid {BORDER}; }}
         .chip-accent {{ background: {ACCENT_SOFT}; color: {ACCENT}; border: 1px solid transparent; }}
         .chip-green {{ background: {GREEN_SOFT}; color: {GREEN}; border: 1px solid transparent; }}

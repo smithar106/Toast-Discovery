@@ -58,8 +58,8 @@ def merchant_card(merchant: dict, answers: dict) -> None:
         <div class="panel-flush" style="margin-bottom:0.5rem;">
             <div class="row" style="padding:0.6rem 1rem;">
                 <div style="min-width:120px; flex-shrink:0;">
-                    <div class="agenda-time">{time}<span style="color:{ui.FAINT}; font-size:0.75rem; font-weight:500; margin-left:2px;"> {ampm}</span></div>
-                    <div class="faint" style="font-size:0.72rem; margin-top:1px;">{date} · {_MT.get(merchant.get('meeting_type',''), merchant.get('meeting_type',''))}</div>
+                    <div class="agenda-time">{time}<span style="color:{ui.FAINT}; font-size:0.85rem; font-weight:500; margin-left:2px;"> {ampm}</span></div>
+                    <div class="faint" style="font-size:0.84rem; margin-top:1px;">{date} · {_MT.get(merchant.get('meeting_type',''), merchant.get('meeting_type',''))}</div>
                 </div>
                 <div style="flex:1; min-width:0;">
                     <span class="agenda-name">{merchant['name']}</span>
