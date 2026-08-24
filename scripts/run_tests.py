@@ -98,7 +98,7 @@ def test_route9_ui_walkthrough():
     extract_btn.click().run()
     assert not at.exception
     md = " ".join(m.value for m in at.markdown)
-    assert "Meeting analysis" in md
+    assert "Outstanding items before submission" in md
     assert "AI EXTRACTED" in md
     print("  ui: summarize & extract surfaces AI evidence = True")
 

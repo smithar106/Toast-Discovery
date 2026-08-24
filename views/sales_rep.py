@@ -343,7 +343,7 @@ def _render_meeting_analysis(merchant: dict, answers: dict, notes_key: str, eval
     analysis = ai_service.meeting_analysis(merchant["id"]) or {"extractions": [], "gaps": []}
 
     st.markdown(
-        '<div class="section-title" style="margin-top:1rem;">Meeting analysis</div>',
+        '<div class="section-title" style="margin-top:1rem;">Outstanding items before submission</div>',
         unsafe_allow_html=True,
     )
     st.markdown(
