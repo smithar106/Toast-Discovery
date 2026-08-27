@@ -362,8 +362,8 @@ def _render_meeting_analysis(merchant: dict, answers: dict, notes_key: str, eval
         unsafe_allow_html=True,
     )
     st.markdown(
-        '<div class="muted small" style="margin-bottom:0.5rem;">"I found evidence related to the following discovery '
-        'requirements. Review the extracted information before saving."</div>',
+        '<div class="muted small" style="margin-bottom:0.5rem;">I found evidence related to the following discovery '
+        'requirements. Review the extracted information before saving.</div>',
         unsafe_allow_html=True,
     )
 
